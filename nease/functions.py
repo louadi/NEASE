@@ -267,7 +267,9 @@ def extract_subnetwork(path_genes,
         
         #Position nodes using Fruchterman-Reingold force-directed algorithm.
         pos = nx.spring_layout(G, k=k, iterations=100)
+        #pos = nx.kamada_kawai_layout(G)
         
+
         
         # Prepare the visualization
         for n, p in pos.items():

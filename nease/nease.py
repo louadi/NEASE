@@ -115,6 +115,9 @@ class run(object):
                 self.enrichment=pathway_enrichment(self.g2edges,self.path, self.mapping,organism).reset_index(drop=True)
                 print('NEASE enrichment done.')
                 
+                
+                
+                
     def get_domains(self):
         
         """
@@ -132,6 +135,9 @@ class run(object):
             
             #DIGGER visualization available for Human
             return self.data.drop(columns=[ 'Domain ID'])
+    
+    
+    
     
     
     def get_edges(self):
@@ -154,6 +160,9 @@ class run(object):
             return edges.reset_index(drop=True)
     
           
+    
+    
+    
     
     def enrich(self, database=  ['PharmGKB',
                                  'HumanCyc',
@@ -208,6 +217,10 @@ class run(object):
 
                 return enrich_results.sort_values(['p_value']).reset_index(drop=True)
 
+            
+            
+
+            
     
     def path_analysis(self,path_id):
         
@@ -291,13 +304,13 @@ class run(object):
                                     hovermode='closest',
                                     margin=dict(b=20,l=5,r=5,t=40),
                                     annotations=[ dict(
-                                        text="Python code: <a href='https://plotly.com/ipython-notebooks/network-graphs/'> p/</a>",
+                                        text="<br> The large nodes have significant p_value (affecting the pathway).<br> 🔴 Spliced gene and known to be part of the patwhay.<br> 🟠 Spliced gene but not known to be in the pathway.",
                                         showarrow=False,
+                                        font=dict(size=16),
                                         xref="paper", yref="paper",
                                         x=0.005, y=-0.002 ) ],
                                     xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                                    yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
-                                    )
+                                    yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)))
 
 
 
