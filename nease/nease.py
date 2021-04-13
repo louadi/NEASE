@@ -307,7 +307,7 @@ class run(object):
                                     annotations=[ dict(
                                         text="<br> The large nodes have significant p_value (affecting the pathway).<br> 🔴 Spliced gene and known to be part of the patwhay.<br> 🟠 Spliced gene but not known to be in the pathway.",
                                         showarrow=False,
-                                        font=dict(size=16),
+                                        font=dict(size=20),
                                         xref="paper", yref="paper",
                                         x=0.005, y=-0.002 ) ],
                                     xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
