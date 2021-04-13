@@ -256,16 +256,17 @@ class run(object):
             
 
 
-    def Vis_path(self,path_id, k=0.8):
+    def Vis_path(self,path_id,file='', k=0.8):
 
             '''
                Visualize the network module of a specific pathway.
-
-                    K: float (default=None))is a parameter to be tuned by the user:
-                    Position nodes using Fruchterman-Reingold force-directed algorithm.
-                    Optimal distance between nodes. If None the distance is set to 1/sqrt(n) where n is the number of nodes. 
-                    Increase this value to move nodes farther apart.
-                    Link: networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.spring_layout.html
+            path_id:    -  str: An unique pathway id. Run  enrich() to get all pathways and their ids.
+            K:          -  Float (default=None))is a parameter to be tuned by the user:
+                            Position nodes using Fruchterman-Reingold force-directed algorithm.
+                            Optimal distance between nodes. If None the distance is set to 1/sqrt(n) where n is the number of nodes. 
+                            Increase this value to move nodes farther apart.
+                        Link: networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.spring_layout.html.
+            file         - A string representing a local file path.
             '''
 
 
@@ -313,7 +314,7 @@ class run(object):
                                     yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)))
 
 
-
-                fig.write_html(path_name+'.html', auto_open=True)
+                fig.write_html(os.path.join(os.path.dirname(file),path_name+'.html'), auto_open=True)
+                
                 return
                 
