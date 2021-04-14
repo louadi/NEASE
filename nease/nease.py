@@ -268,53 +268,72 @@ class run(object):
                         Link: networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.spring_layout.html.
             file         - A string representing a local file path.
             '''
+            if len(self.data)==0:
+                print('Processing failed')
+            elif len(self.interacting_domains)==0:
+                print('No affected edges identified.') 
 
 
-            enrich,affected_graph=single_path_enrich(path_id,self.path,self.g2edges,self.mapping,self.organism)
+            path_info=self.enrichment[self.enrichment['Pathway ID']==path_id]
 
-            if len(enrich)==0:
-                return
+            if len(path_info)==0:
+                print('No pathway with the given ID found.')
 
             else:
-
-                # Get genes of the pathway (Entrez IDs)
-                path_genes=list(self.path[ self.path['external_id']==path_id ]['entrez_gene_ids'])[0]
-                
-                significant= list(enrich [enrich ['p_value']<=0.05] ['NCBI gene ID'].unique())
-                
-                graph_data= extract_subnetwork(path_genes,
-                                               self.ppi,
-                                               list(enrich['NCBI gene ID'].unique()),
-                                               self.spliced_genes,
-                                               k,
-                                               self.mapping,
-                                               affected_graph,
-                                               significant)
-                
-                
-                
-                
-                path_info=self.enrichment[self.enrichment['Pathway ID']==path_id]
                 path_name=list(path_info['Pathway name'])[0]
-                
-                fig = go.Figure(data=graph_data,
-                                 layout=go.Layout(
-                                    title='<br>'+path_name,
-                                    titlefont_size=16,
-                                    showlegend=False,
-                                    hovermode='closest',
-                                    margin=dict(b=20,l=5,r=5,t=40),
-                                    annotations=[ dict(
-                                        text="<br> The large nodes have significant p_value (affecting the pathway).<br> 🔴 Spliced gene and known to be part of the patwhay.<br> 🟠 Spliced gene but not known to be in the pathway.",
-                                        showarrow=False,
-                                        font=dict(size=20),
-                                        xref="paper", yref="paper",
-                                        x=0.005, y=-0.002 ) ],
-                                    xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                                    yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)))
+                print('Enrichment of the pathway: '+path_name+'.\n')
+                print('Overall p_value: ',list(path_info['p_value'])[0])
+                print('\n')
+                # run enrichment
+
+                enrich,affected_graph=single_path_enrich(path_id,self.path,self.g2edges,self.mapping,self.organism)
+
+                if len(enrich)==0:
+                    print('No enrichment or genes found for the selected pathway.')
+
+                    return
+
+                else:
+
+                    # Get genes of the pathway (Entrez IDs)
+                    path_genes=list(self.path[ self.path['external_id']==path_id ]['entrez_gene_ids'])[0]
+
+                    significant= list(enrich [enrich ['p_value']<=0.05] ['NCBI gene ID'].unique())
+
+                    graph_data= extract_subnetwork(path_genes,
+                                                   self.ppi,
+                                                   list(enrich['NCBI gene ID'].unique()),
+                                                   self.spliced_genes,
+                                                   k,
+                                                   self.mapping,
+                                                   affected_graph,
+                                                   significant)
 
 
-                fig.write_html(os.path.join(os.path.dirname(file),path_name+'.html'), auto_open=True)
-                
-                return
-                
+
+
+                    path_info=self.enrichment[self.enrichment['Pathway ID']==path_id]
+                    path_name=list(path_info['Pathway name'])[0]
+
+                    fig = go.Figure(data=graph_data,
+                                     layout=go.Layout(
+                                        title='<br>'+path_name,
+                                        titlefont_size=16,
+                                        showlegend=False,
+                                        hovermode='closest',
+                                        margin=dict(b=20,l=5,r=5,t=40),
+                                        annotations=[ dict(
+                                            text="<br> The large nodes have p_value<=0.05 (affecting the pathway).<br> 🔴 Spliced gene and known to be part of the patwhay.<br> 🟠 Spliced gene but not known to be in the pathway.",
+                                            showarrow=False,
+                                            font=dict(size=20),
+                                            xref="paper", yref="paper",
+                                            x=0.005, y=-0.002 ) ],
+                                        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                                        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)))
+                    
+                    
+                    file_path=os.path.join(os.path.dirname(file),path_name+'.html')
+                    fig.write_html(file_path, auto_open=True)
+                    print('Visualization of the pathway generated in: '+file_path)
+                    
+                    return

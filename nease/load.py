@@ -29,7 +29,6 @@ PPI={}
 # Human
 database_mapping['Human']= pd.read_pickle(os.path.join(os.path.dirname(__file__),"data/database/Human.pkl"))
 Pathways['Human']= pd.read_pickle(os.path.join(os.path.dirname(__file__),"data/pathways/pathways_human"))
-
 network['Human']=load_obj(os.path.join(os.path.dirname(__file__),'data/network/graph_human'))
 PPI['Human']=load_obj(os.path.join(os.path.dirname(__file__),'data/network/PPI_Human'))
 
