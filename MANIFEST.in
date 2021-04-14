@@ -1,4 +1,5 @@
 
-graft data
+recursive-include  nease/data  *
+
 global-exclude *.py[cod] __pycache__ *.so
 

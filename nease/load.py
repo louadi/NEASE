@@ -26,6 +26,8 @@ PPI={}
 
 
 
+
+
 # Human
 database_mapping['Human']= pd.read_pickle(os.path.join(os.path.dirname(__file__),"data/database/Human.pkl"))
 Pathways['Human']= pd.read_pickle(os.path.join(os.path.dirname(__file__),"data/pathways/pathways_human"))
