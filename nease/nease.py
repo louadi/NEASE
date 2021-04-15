@@ -34,7 +34,7 @@ class run(object):
             print('Error: Please choose one of the  supported  organism: "Human" and "Mouse".')
         
          
-        if input_type!='MAJIQ' and organism!='Standard':
+        if input_type!='MAJIQ' and input_type!='Standard':
             raise ValueError('Input type not supported')
         else:
         
