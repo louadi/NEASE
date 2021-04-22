@@ -60,14 +60,14 @@ class run(object):
             
             elif input_type=='Standard':
                     
-                #try:
+                try:
                     self.data,self.spliced_genes=process_standard(data,self.mapping,min_delta )
                     if len(self.data)==0:
                         print('Found no overlap with protein domains.')
                         print('Make sure that the genomic coordinates of the exons correspond to the human genome build hg38 (GRCh38).')
 
                     
-                #except:
+                except:
                         print('Could not recognize the standard format. Please make sure your table matches the standard format.')
                         print('Gene ensembl ID          EXON START        EXON END          dPSI (optional)')
                         print('Make sure that the genomic coordinates of the exons correspond to the human genome build hg38 (GRCh38).')
@@ -250,7 +250,9 @@ class run(object):
                 #enrich_results['adj p_value']=sm.stats.multipletests(list(enrich_results['p_value']),method='fdr_bh',alpha=0.01)[1]
                 enrich_results['adj p_value']=sm.stats.fdrcorrection(list(enrich_results['p_value']),alpha=0.01)[1]
                 
-                
+                # shift column 'score to the last position
+                scores = enrich_results.pop('Nease score')
+                enrich_results.insert(len(enrich_results.columns), 'Nease score', scores)
 
                 print('NEASE enrichment for the pathway databases:\n',[ x for x in database])
                 num=len(enrich_results[enrich_results['adj p_value']<=cutoff])
@@ -259,7 +261,7 @@ class run(object):
                 else:
                     print("Found "+str(num)+" enriched pathways after multiple testing correction.\n")
 
-                return enrich_results.sort_values(['p_value']).reset_index(drop=True)
+                return enrich_results.sort_values(['Nease score','p_value'],ascending=[False,True]).reset_index(drop=True)
 
             
             
@@ -300,7 +302,10 @@ class run(object):
             
 
 
-    def Vis_path(self,path_id,file='', k=0.8):
+    def Vis_path(self,
+                 path_id,file='', 
+                 k=0.8,
+                 auto_open=True):
 
             '''
                Visualize the network module of a specific pathway.
@@ -377,7 +382,7 @@ class run(object):
                     
                     
                     file_path=os.path.join(os.path.dirname(file),path_name+'.html')
-                    fig.write_html(file_path, auto_open=True)
+                    fig.write_html(file_path, auto_open=auto_open)
                     print('Visualization of the pathway generated in: '+file_path)
                     
                     return

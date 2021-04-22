@@ -106,14 +106,22 @@ def pathway_enrichment(g2edges,paths, mapping,organism):
                 tmp=len([x for x in g2edges[gene] if x in path_genes ])
 
                 if tmp>0:
-                    # gene with edges connected to the pathway
-                    
-                    gene_count=gene_count+1
+
                     # increment for path edges
                     connected=connected+tmp
                     
                     # add gene to the gene list of the pathway
                     genes_tmp.append(Entrez_to_name(gene,mapping) +" ("+str(tmp)+")")
+                    
+                    
+                    # gene specific test
+                    _,p_gene=edge_enrich(tmp ,len(g2edges[gene])-tmp , p, n)
+                        
+                    if p_gene<=0.05:
+                        # gene with edges siginifically connected to the pathway
+                    
+                        gene_count=gene_count+1
+                    
         
         
         #  affected edges not connected to tha pathway
@@ -131,7 +139,11 @@ def pathway_enrichment(g2edges,paths, mapping,organism):
         p_values.append(p_value_tmp)
         
         #compute combined score
-        #score.append( (1+(gene_count/2)) * -np.log(p_value_tmp) )
+        if p_value_tmp<0.05:
+            s= -(np.sqrt(gene_count) * np.log(p_value_tmp))
+        else: s=0
+            
+        score.append( s  )
         path_name.append(path)
         source.append(list(paths[paths['pathway']==path]['source'])[0])   
         path_id.append(list(paths[paths['pathway']==path]['external_id'])[0]) 
@@ -139,8 +151,8 @@ def pathway_enrichment(g2edges,paths, mapping,organism):
 
         
     # save results
-    Enrichment = pd.DataFrame(list(zip(path_id, path_name,source, genes,p_values)), 
-                              columns= ['Pathway ID', 'Pathway name', 'Source', 'Spliced genes (number of interactions affecting the pathway)', "p_value"] )
+    Enrichment = pd.DataFrame(list(zip(path_id, path_name,source, genes,p_values,score)), 
+                              columns= ['Pathway ID', 'Pathway name', 'Source', 'Spliced genes (number of interactions affecting the pathway)', "p_value",'Nease score'] )
     
 
     

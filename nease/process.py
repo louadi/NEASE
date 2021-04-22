@@ -149,10 +149,15 @@ def process_MAJIQ(data,
                   mapping,
                   Majiq_confidence=0.95, 
                   min_delta=0.05 ):
-        try:
+        try:     
+            
             # extract exon skipping events:
-            data=data[ data['ES']==True]
-
+            if data['ES'].dtype=='bool':
+                data=data[ data['ES']==True]
+            else:
+                data=data[ data['ES']=='True']
+                
+                
             # helper functions:
             print('Processing MAJIQ format...')
             f = lambda x: [abs(float(y)) for y in x.split(';')]
@@ -161,7 +166,6 @@ def process_MAJIQ(data,
             # get Delta PSI values for each junction
             data["delta"] = data['E(dPSI) per LSV junction'].apply(f)
             data["P(|dPSI|>=0.20)"] = data['P(|dPSI|>=0.20) per LSV junction'].apply(f)
-
             data["delta_sif"] = data['delta'].apply(l)
             data=data[ data['delta_sif']]
         except :
