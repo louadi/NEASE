@@ -76,15 +76,17 @@ def process_standard (data,
 
                 # Verify the start and end
                 try:
-                    if data[columns[1]].dtypes!='int' and data[columns[2]].dtypes!='int':
                         
                         # Remove non numerical 
-                        data=data[data[columns[1]].apply(lambda x: x.isnumeric())]
-                        data=data[data[columns[2]].apply(lambda x: x.isnumeric())]
-
-                        # convert to int
-                        data[columns[1]]=data[columns[1]].astype(int)
-                        data[columns[2]]=data[columns[2]].astype(int)
+                        if  not data[columns[1]].dtype=='int':
+                            data=data[data[columns[1]].apply(lambda x: x.isnumeric())]
+                            # convert to int
+                            data[columns[1]]=data[columns[1]].astype(int)
+                            
+                            
+                        if not data[columns[2]].dtype=='int':
+                            data=data[data[columns[2]].apply(lambda x: x.isnumeric())]
+                            data[columns[2]]=data[columns[2]].astype(int)
                 except:
                     raise ValueError('Could not find exons coordinates. Please make sure that the second column corresponds to the exon start and the third to the exon end (hg38).')
 

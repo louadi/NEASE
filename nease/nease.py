@@ -61,17 +61,17 @@ class run(object):
             
             elif input_type=='Standard':
                     
-                try:
+                #try:
                     self.data,self.spliced_genes=process_standard(data,self.mapping,min_delta )
                     if len(self.data)==0:
                         print('Found no overlap with protein domains.')
                         print('Make sure that the genomic coordinates of the exons correspond to the human genome build hg38 (GRCh38).')
 
                     
-                except:
-                        print('Could not recognize the standard format. Please make sure your table matches the standard format.')
-                        print('Gene ensembl ID          EXON START        EXON END          dPSI (optional)')
-                        print('Make sure that the genomic coordinates of the exons correspond to the human genome build hg38 (GRCh38).')
+                #except:
+                        #print('Could not recognize the standard format. Please make sure your table matches the standard format.')
+                        #print('Gene ensembl ID          EXON START        EXON END          dPSI (optional)')
+                        #print('Make sure that the genomic coordinates of the exons correspond to the human genome build hg38 (GRCh38).')
                     
             
             
