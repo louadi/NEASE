@@ -47,6 +47,7 @@ class run(object):
             self.ppi=PPI[organism]
             
             self.data=[]
+            self.spliced_genes=[]
             if input_type=='MAJIQ':
 
                 # Processing Majiq output
@@ -176,10 +177,9 @@ class run(object):
             gseapy_databases=['KEGG_2019_Human', 'Reactome_2016','WikiPathways_2019_Human']
         
         '''
-        
-        
-        if len(self.spliced_genes)==0:
-            print('Processing failed.')
+
+        if not self.spliced_genes:
+            print('No genes found on your input.')
             
         else:
             # get gene sets supported in gseapy
@@ -276,7 +276,7 @@ class run(object):
             
         if len(self.data)==0:
             print('Processing failed')
-        elif len(self.interacting_domains)==0:
+        elif not self.interacting_domains:
             print('No affected edges identified.') 
             
             
