@@ -445,13 +445,14 @@ def stats_domains(affecting_percentage,
         con.set_color([0, 0, 0])
         ax2.add_artist(con)
         con.set_linewidth(4)
+        
+        file_path=os.path.join(os.path.dirname(file_path),'domains_stats.pdf')
 
+        plt.savefig(file_path,format='pdf',bbox_inches='tight')
         plt.show()
         
         # Save the figure
-        if file_path!='':
-            file_path=os.path.join(os.path.dirname(file_path)+'domains_stats')
 
-            plt.savefig(file_path)
+
             
         return

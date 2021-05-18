@@ -129,13 +129,11 @@ class run(object):
 
             # number of genes with affected domains/number of all events (genes)
             gene_number=len(self.data['NCBI gene ID'].unique())
-            affecting_percentage= int(gene_number/len(self.spliced_genes))
-
+            affecting_percentage= round(gene_number/len(self.spliced_genes), 2)
             interacting=len(self.data[self.data['Interacting domain']]['Domain ID'].unique())
 
             domain_number=len(self.data['Domain ID'].unique())
-
-            binding_percentage=int(interacting/domain_number)
+            binding_percentage=round(interacting/domain_number , 2)
 
 
 
