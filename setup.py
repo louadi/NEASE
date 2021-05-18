@@ -35,6 +35,7 @@ setup(name='nease',
         'scipy>=1.6.2',
         'statsmodels>=0.12.2',
         'gseapy>=0.10.4',
+        'matplotlib>=3.4.1',
     ],
 
 )

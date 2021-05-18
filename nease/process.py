@@ -189,7 +189,16 @@ def process_MAJIQ(data,
         
         z= lambda x: x.split(':')[1]
         data['Gene ID'] = data['Gene ID'].apply(z)
-    
+        
+        
+            
+        #############################
+        # get all spliced genes here
+        # get all coding genes affected by splicing
+        # Only genes with Pfam domain will be considred here
+        # NCBI id used here for the network visualization
+        spliced_genes=list(data['Gene ID'].unique())
+        spliced_genes=[Ensemb_to_entrez(x,mapping) for x in spliced_genes ]
         
 
         junctions=list(data['Junctions coords'])
@@ -254,10 +263,7 @@ def process_MAJIQ(data,
                 #Map exons to domain
                 mapping_tb=pd.merge(mapping, data,  left_on='Genomic coding start', right_on='targets')
                 
-                # get all coding genes affected by splicing
-                # Only genes with Pfam domain will be considred here
-                # NCBI id used here for the network visualization
-                spliced_genes=list(mapping_tb['NCBI gene ID'].unique())
+
 
                 #check if the mapping based on coordinate match the gene ID provided from Majiq
                 mapping_tb=mapping_tb[mapping_tb['Gene ID']==mapping_tb['Gene stable ID']]
@@ -298,4 +304,12 @@ def Entrez_to_name(gene,mapping):
         return mapping[mapping['NCBI gene ID']==int(gene)]['Gene name'].unique()[0]
     
     except :
-        return id
+        return gene
+    
+    
+def Ensemb_to_entrez(gene,mapping):
+    try:
+        return mapping[mapping['Gene stable ID']==gene]['NCBI gene ID'].unique()[0]
+    
+    except :
+        return gene

@@ -90,8 +90,8 @@ class run(object):
                 print('\n\t\tData Summary')
                 print('**************************************************')
 
-                print(str(len(self.data['Pfam ID'].unique()))+' protein domains are affected by AS.\n'
-                      + str(len(self.data[self.data['Interacting domain']]['Pfam ID'].unique()))+' of the affected domains have known interactions.' ) 
+                print(str(len(self.data['Domain ID'].unique()))+' protein domains are affected by AS.\n'
+                      + str(len(self.data[self.data['Interacting domain']]['Domain ID'].unique()))+' of the affected domains have known interactions.' ) 
 
 
                 # Identify binding of affected domains = Edges in the PPI
@@ -116,7 +116,36 @@ class run(object):
                 
                 
                 
+    def get_stats(self, file_path=''):
+        
+        """
+            Display the list of AS events in NEASE format.
+        """
                 
+        if len(self.data)==0 :
+            print('Processing failed')
+        
+        else:
+
+            # number of genes with affected domains/number of all events (genes)
+            gene_number=len(self.data['NCBI gene ID'].unique())
+            affecting_percentage= int(gene_number/len(self.spliced_genes))
+
+            interacting=len(self.data[self.data['Interacting domain']]['Domain ID'].unique())
+
+            domain_number=len(self.data['Domain ID'].unique())
+
+            binding_percentage=int(interacting/domain_number)
+
+
+
+
+            stats_domains(affecting_percentage,binding_percentage,file_path)
+        return
+        
+        
+        
+        
     def get_domains(self):
         
         """
@@ -274,9 +303,9 @@ class run(object):
         Run enrichment analysis on a specific pathway with details of impact of AS.
         '''
             
-        if len(self.data)==0:
+        if self.data.empty:
             print('Processing failed')
-        elif not self.interacting_domains:
+        elif  self.interacting_domains.empty:
             print('No affected edges identified.') 
             
             
@@ -317,9 +346,9 @@ class run(object):
                         Link: networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.spring_layout.html.
             file         - A string representing a local file path.
             '''
-            if len(self.data)==0:
+            if self.data.empty:
                 print('Processing failed')
-            elif len(self.interacting_domains)==0:
+            elif self.interacting_domains.empty:
                 print('No affected edges identified.') 
 
 
