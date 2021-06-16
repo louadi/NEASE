@@ -23,7 +23,7 @@ To install the package from git:
 `pip install .`
 
 
-`# Enjoy your instance of NEASE`
+Enjoy your instance of NEASE
 
 
 
