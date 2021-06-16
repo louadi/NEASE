@@ -298,7 +298,7 @@ def extract_subnetwork(path_genes,
                                 mode='markers+text',
                                 hoverinfo='text',
                                 textposition='top center',
-                                textfont_size = 20,
+                                #textfont_size = 20,
                                 marker=dict(
                                 reversescale=True,
                                     color=[],
