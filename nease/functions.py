@@ -61,7 +61,7 @@ def gene_to_edges(data):
         return gene_edges
     
     
-def pathway_enrichment(g2edges,paths, mapping,organism):
+def pathway_enrichment(g2edges,paths, mapping,organism,p_value_cutoff):
     # General enrichment analysis
     
     pathway_genes=[]
@@ -141,8 +141,8 @@ def pathway_enrichment(g2edges,paths, mapping,organism):
         p_values.append(p_value_tmp)
         
         #compute combined score
-        if p_value_tmp<0.05:
-            s= -(np.sqrt(gene_count) * np.log(p_value_tmp))
+        if p_value_tmp<p_value_cutoff:
+            s= -(np.sqrt(gene_count) * np.log10(p_value_tmp))
         else: s=0
             
         score.append( s  )
@@ -171,7 +171,8 @@ def single_path_enrich(path_id,Pathways,g2edges,mapping,organism):
         # For statistical test: edge enrichment
         # TO DO for mouse
         if organism=='Human':
-            n=52467
+            n=52467 
+            
             
         p=int(Pathways [Pathways['external_id']==path_id]['Degree in the structural PPI'])
         path_genes=list(Pathways [Pathways['external_id']==path_id]['entrez_gene_ids'])[0]
@@ -217,7 +218,7 @@ def single_path_enrich(path_id,Pathways,g2edges,mapping,organism):
                 G.add_edges_from( [ (g,x) for x in edges ]  )
                 
         Enrichment = pd.DataFrame(list(zip(spliced_genes,spliced_genes_entrez, gene_association, num,p_val, affected_edges,affected_edges_entrez)), 
-                          columns= ['Spliced genes','NCBI gene ID','Gene knwon to be in the pathway','Percentage of edges associated to the pathway', 'p_value', 'Affected binding (edges)','Affected binding (NCBI)'] )
+                          columns= ['Spliced genes','NCBI gene ID','Gene is known to be in the pathway','Percentage of edges associated to the pathway', 'p_value', 'Affected binding (edges)','Affected binding (NCBI)'] )
         
         
         

@@ -16,7 +16,9 @@ class run(object):
                  organism,
                  input_type='Standard',
                  min_delta=0.05,
-                 Majiq_confidence=0.95):
+                 Majiq_confidence=0.95,
+                 p_value_cutoff=0.05
+                ):
         
         
         
@@ -111,7 +113,7 @@ class run(object):
                 print('Running enrichment analysis...')
                 
                 self.supported_database=  list(self.path['source'].unique())
-                self.enrichment=pathway_enrichment(self.g2edges,self.path, self.mapping,organism).reset_index(drop=True)
+                self.enrichment=pathway_enrichment(self.g2edges,self.path, self.mapping,organism,p_value_cutoff).reset_index(drop=True)
                 print('NEASE enrichment done.')
                 
                 
