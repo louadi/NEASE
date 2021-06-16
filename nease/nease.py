@@ -13,21 +13,46 @@ class run(object):
     
     def __init__(self, 
                  data ,
-                 organism,
+                 organism='Human',
                  input_type='Standard',
+                 p_value_cutoff=0.05,
                  min_delta=0.05,
                  Majiq_confidence=0.95,
-                 p_value_cutoff=0.05
+                
                 ):
         
         
         
         """
-            data: dataframe with list of (diff.) splicing events or junctions. 
+            Create an instance of NEASE object.
+            
+            
+            Parameters
+            ---------- 
+            data: dataframe 
+                Splicing (or diff. splicing) exons  or events. 
+               
+                Standard input: Ensemble gene ID    Start of exon  End of exon     dPsi (optional)
+                for MAJOQ output, Please change the  input_type to "MAJIQ"
                 
-                Standard input: Ensemble gene ID    Start of exon  End of exon
-                for external tools, Please change the  input_type to "MAJIQ",...
-                #TO DO
+            organism : str, optional
+                NEASE 1.0 support only Human.
+            
+            input_type: str, optional
+                
+                Either "Standard" or "MAJIQ", If you need support of more types of outputs. Please contact: louadi@wzw.tum.de
+                
+            p_value_cutoff: float, optional
+               The p value cutoff used to compute NEASE scores. (default is 0.05)
+            
+            min_delta: float, optional
+                min delta to consider in case your input has dPsi column  (default is 0.05)
+            
+            Majiq_confidence: float, optional
+                In case of input_type='MAJIQ'. the parameter P(dPSI > 20%) is needed. Check MAJIQ paper for details about this  (default is 0.95)  
+                
+            
+                
          """
         self.data=[]
         self.organism=organism
@@ -121,7 +146,13 @@ class run(object):
     def get_stats(self, file_path=''):
         
         """
-            Display the list of AS events in NEASE format.
+            Display the stats of affected domains by splicing.
+            
+            Parameters
+            ---------- 
+            file_path : str
+                Path for saving the statistics figure.
+            
         """
                 
         if len(self.data)==0 :
@@ -150,7 +181,12 @@ class run(object):
         
         """
             Display the list of AS events in NEASE format.
-         """
+            
+        Returns
+        -------
+        pd.DataFrame Object
+        
+        """
                 
         if len(self.data)==0 :
             print('Processing failed')
@@ -172,6 +208,11 @@ class run(object):
         
         """   
             Display affected interactions from AS. 
+            
+        Returns
+        -------
+        pd.DataFrame Object
+        
         """
         if len(self.data)==0:
             print('Processing failed')
@@ -198,10 +239,15 @@ class run(object):
         '''
         Classic gene level enrichement using the python library gseapy.
         
-        param gene_sets: str, list, tuple of Enrichr Library name(s). 
+        Parameters
+        ---------- 
+        gseapy_databases: str, list, tuple of Enrichr Library name(s). 
                   or custom defined gene_sets (dict, or gmt file). For more details, please check: https://pypi.org/project/gseapy/ 
 
-                   
+         Returns
+        -------
+        pd.DataFrame Object    
+        
         Example:
             gseapy_databases=['KEGG_2019_Human', 'Reactome_2016','WikiPathways_2019_Human']
         
@@ -252,7 +298,24 @@ class run(object):
         
         """ 
         Run enrichement analysis
-        database: List of gene set sources for enrichment.
+        
+        
+        Parameters
+        ---------- 
+        database: List 
+            gene set sources for enrichment.
+        cutoff: float
+            The p value cutoff.
+        
+        
+            
+        Returns
+        -------
+        pd.DataFrame Object
+            
+        Example: 
+                events=nease.run(table, organism='Human')
+                events.enrich(database=['Reactome'])
         
         """
         
@@ -301,6 +364,27 @@ class run(object):
         
         '''
         Run enrichment analysis on a specific pathway with details of impact of AS.
+        
+        Parameters
+        ---------- 
+        path_id: str 
+            The ID of the pathway f interest.
+            Run enrich() to find enriched pathways and their IDs.
+            
+            
+        Returns
+        -------
+        pd.DataFrame Object
+        
+        exanple:
+                # Run general enrichment
+                events=nease.run(table, organism='Human')
+                events.enrich(database=['Reactome']
+                
+                # Pathway specific analysis
+                events.path_analysis('R-HSA-388396')
+
+        
         '''
             
         if self.data.empty:
@@ -332,12 +416,47 @@ class run(object):
 
 
     def Vis_path(self,
-                 path_id,file='', 
+                 path_id,
+                 file='', 
                  k=0.8,
                  auto_open=True):
 
             '''
                Visualize the network module of a specific pathway.
+               
+               
+            Parameters
+            ---------- 
+            path_id: str 
+                The ID of the pathway f interest.
+                Run enrich() to find enriched pathways and their IDs.
+                
+            file: str
+                 A string representing a local file path for the html file.
+
+            k: float 
+                 -  Float (default=None))is a parameter to be tuned by the user:
+                            Position nodes using Fruchterman-Reingold force-directed algorithm.
+                            Optimal distance between nodes. If None the distance is set to 1/sqrt(n) where n is the number of nodes. 
+                            Increase this value to move nodes farther apart.
+                    Link: networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.spring_layout.html.
+                
+            auto_open: Boolean 
+            
+            
+            Returns
+            -------
+            pd.DataFrame Object
+
+            exanple:
+                    # Run general enrichment
+                    events=nease.run(table, organism='Human')
+                    events.enrich(database=['Reactome']
+
+                    # Pathway specific analysis
+                    events.path_analysis('R-HSA-388396')
+
+               
             path_id:    -  str: An unique pathway id. Run  enrich() to get all pathways and their ids.
             K:          -  Float (default=None))is a parameter to be tuned by the user:
                             Position nodes using Fruchterman-Reingold force-directed algorithm.
@@ -409,7 +528,7 @@ class run(object):
                                         xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
                                         yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)))
                     
-                    
+
                     file_path=os.path.join(os.path.dirname(file),path_name+'.html')
                     fig.write_html(file_path, auto_open=auto_open)
                     print('Visualization of the pathway generated in: '+file_path)
