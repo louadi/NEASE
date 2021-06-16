@@ -1,5 +1,5 @@
 # NEASE
-the python tool NEASE  (Network Enrichment method for Alternative Splicing Events) for functional enrichment of alternative splicing events. 
+NEASE  (Network Enrichment method for Alternative Splicing Events) a tool for functional enrichment of alternative splicing exons/events. 
 
 
 ## General info
