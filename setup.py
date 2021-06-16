@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 
 
 setup(name='nease',
-      version='0.0.2',
+      version='0.0.3',
       description='NEASE: A network-based approach for the enrichment of alternative splicing events',
       long_description=README,
       url='https://github.com/louadi/NEASE',
