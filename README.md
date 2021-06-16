@@ -31,6 +31,9 @@ Enjoy your instance of NEASE
 ## Tutorials
 
 A step-by-step guide to use NEASE ia available [here](https://github.com/louadi/NEASE-tutorials).
+If you would like to run the tutorial jupyter notebooks, you also need to install jupyter.
+`conda install jupyter`
+
 
 
 ## Contact 
