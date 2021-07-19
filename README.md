@@ -34,7 +34,8 @@ Enjoy your instance of NEASE
 A step-by-step guide to use NEASE is available [here](https://github.com/louadi/NEASE-tutorials).
 
 
-A simple example for running NEASE on a standard input: Notebook/Google Colab
+A simple example for running NEASE on a standard input:
+([Notebook](https://github.com/louadi/NEASE-tutorials/blob/main/MS.ipynb)/[Google Colab](https://colab.research.google.com/github/louadi/NEASE-tutorials/blob/main/MS.ipynb))
 
 
 
