@@ -30,7 +30,11 @@ Enjoy your instance of NEASE
 
 ## Tutorials
 
+
 A step-by-step guide to use NEASE is available [here](https://github.com/louadi/NEASE-tutorials).
+
+
+A simple example for running NEASE on a standard input: Notebook/Google Colab
 
 
 
