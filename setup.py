@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 
 
 setup(name='nease',
-      version='0.0.4',
+      version='1.0.1',
       description='NEASE: A network-based approach for the enrichment of alternative splicing events',
       long_description=README,
       url='https://github.com/louadi/NEASE',
@@ -28,8 +28,8 @@ setup(name='nease',
       include_package_data=True,
       python_requires='>=3.6',
       install_requires=[
-        'pandas>=1.2.1',
-        'numpy>=1.20.2',
+        'pandas>=1.1.0',
+        'numpy>= 1.19',
         'networkx>=2.5',
         'plotly>=4.14.3',
         'scipy>=1.6.2',
