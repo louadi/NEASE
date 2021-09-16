@@ -143,6 +143,48 @@ def process_standard (data,
 
 
 
+def process_spycone (spycone,
+                      mapping,
+                      ):
+    
+        '''
+        # This function is used for output of spycone only
+        # example of input
+            domains
+            64225/PF02263
+            64225/PF02841
+            64864/PF18326
+            6188/PF07650
+        
+        
+       '''
+        
+        mapping['id']=mapping['NCBI gene ID'].astype('str')+'/'+mapping['Pfam ID'].astype('str')
+
+        # map to domains by calculating the overlap of exon coordinate and domain
+        mapping_tb=pd.merge(mapping,spycone,left_on='id',right_on=spycone.columns[0]).drop_duplicates()
+        
+        
+        # get all coding genes affected by splicing
+        # Only genes with Pfam domain will be considred here
+        # NCBI id used here for the network visualization
+        spliced_genes=list(mapping_tb['NCBI gene ID'].unique())
+
+        if len(mapping_tb)==0:
+            return []
+        
+
+        mapping_tb=mapping_tb[['Gene name','NCBI gene ID','Gene stable ID','Exon stable ID','Pfam ID']]
+         
+        mapping_tb=mapping_tb[mapping_tb['NCBI gene ID'].notnull()]
+        mapping_tb['NCBI gene ID']=mapping_tb['NCBI gene ID'].astype('int').astype('str')
+    
+
+        
+        
+      
+        return mapping_tb,spliced_genes
+
 
 
 

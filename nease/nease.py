@@ -61,8 +61,9 @@ class run(object):
             print('Error: Please choose one of the  supported  organism: "Human" and "Mouse".')
         
          
-        if input_type!='MAJIQ' and input_type!='Standard':
+        if input_type!='MAJIQ' and input_type!='Standard' and input_type!='Spycone':
             raise ValueError('Input type not supported')
+            
         else:
         
             # TO DO
@@ -101,8 +102,15 @@ class run(object):
                         #print('Make sure that the genomic coordinates of the exons correspond to the human genome build hg38 (GRCh38).')
                     
             
+            elif input_type=='Spycone':
+                    
+                    self.data,self.spliced_genes=process_spycone(data,self.mapping )
+                    if len(self.data)==0:
+                        print('Found no overlap with protein domains.')
+                        print('')
+  
+                    
             
-        
 
             
 
