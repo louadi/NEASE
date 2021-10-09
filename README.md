@@ -123,7 +123,7 @@ events.get_edges()
 
 Main function of NEASE
 
-database: a list of pathway databases to run enrichment on it. Supported databases:
+database: a list of pathway databases to run enrichment on it. 
 
 
 ```python
@@ -137,9 +137,8 @@ events.enrich(database=['Reactome'])
 
 ###  Pathway specific analysis
 
-Functions to focus on a sinlge pathway.
 
-
+#### get list of genes affecting pathways and their statistics
 path_id: Pathway ID. You can find pathways id in the enrichment table results.
 
 
@@ -149,21 +148,17 @@ events.path_analysis('R-HSA-112314')
 ```
 
 
-Visualize a pathway in the PPI: 
+#### Visualize a pathway in the PPI:
 
-generate an HTML file with the network [example](https://tender-elion-977996.netlify.app/).
+Generate an HTML file with the network [example](https://tender-elion-977996.netlify.app/).
 
 path_id: Pathway ID. You can find pathways id in the enrichment table results.
 
 file: A string representing a local file path for the html file.
 
-k: float  -  Float Position nodes using Fruchterman-Reingold force-directed algorithm is a parameter to be tuned by the user
+k: float  -  A Float for the algorithm  Fruchterman-Reingold force-directed for nodes positions to be tuned by the user. You might need to run the functions multiple times for the optimal visualizations.
         [more details](networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.spring_layout.html).
        
-    
-    
-auto_open: Boolean 
-
 
 ```python
 events.Vis_path("R-HSA-5674135",file='AS data/enrichment/',k=0.8)
