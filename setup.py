@@ -36,7 +36,7 @@ setup(name='nease',
         'statsmodels>=0.12.2',
         'gseapy>=0.10.4',
         'matplotlib>=3.4.1',
-        "mygene>=3.2.2",
+        'mygene>=3.2.2',
     ],
 
 )
