@@ -75,9 +75,9 @@ table: Data input as DataFrame object as explained in "Data input".
 
 input_type: Either "Standard",'Whippet','rmats','Dexeq'or "MAJIQ".
 
-``python
+```python
 events=nease.run(table, organism='Human',input_type='MAJIQ')
-``
+```
 
 
 ###  General functions
@@ -85,14 +85,12 @@ Get statstics of your data.
 
 ```python
 events.get_stats()
-
 ```
 
 
 Get a list of all affected domains.
 ```python
 events.get_domains()
-
 ```
 
 
@@ -101,7 +99,6 @@ Get a list of all affected linear motifs.
 
 ```python
 events.get_elm()
-
 ```
 
 
