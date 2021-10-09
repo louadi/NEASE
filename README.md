@@ -11,6 +11,125 @@ Next, NEASE performs gene set overrepresentation analysis and identifies enriche
 ![alt text](https://user-images.githubusercontent.com/22538496/122232299-6a25cb00-cebb-11eb-8230-b16b6db81b01.png)
 
 
+## Data input
+
+The standard input of the package is a DataFrame object with the exon coordinates and Ensembl IDs of the genes (also recommended).
+- first column  - genes IDs (Only Ensembl gene IDs can be used).
+- Second column - start of the exon coordinate.
+- Third column  - end of the exon coordinate.
+- Fourth column - dPSI (optionally)
+
+
+
+| Gene              |   Start   |   End     |dpsi  | 
+|-------------------|-----------|-----------|------|
+| ENSG00000154263   | 69314431  | 69315425  |-0.10 | 
+| ENSG00000154265   | 87411893  | 87412033  | 0.13 | 
+
+
+
+
+The package also supports the output of multiple AS differential detection tools such as rMATs, Whippet and MAJIQ [55] where NEASE only considers annotated exons. 
+If you need help with your tool or need to add the support of more tools, please contact us.
+
+
+
+## Main functions and examples
+
+Please note, that all functions are annotated with dockstrings for more details.
+
+Import NEASE package and pandas:
+
+```python
+import nease
+import pandas as pd
+```
+
+
+Run NEASE 
+table: Data input as DataFrame object as explained in "Data input".
+input_type: Either "Standard","Spycone",'Whippet','rmats','Dexeq'or "MAJIQ".
+
+```python
+events=nease.run(table, organism='Human',input_type='MAJIQ')
+```
+
+Get statstics of your data.
+
+```python
+events.get_stats()
+
+```
+
+
+Get a list of all affected domains.
+
+```python
+events.get_domains()
+
+```
+
+
+Get a list of all affected linear motifs.
+
+```python
+events.get_elm()
+
+```
+
+
+Get a list of all affected residues and their interactions from the PDB.
+
+```python
+events.get_pdb()
+
+```
+
+
+List of affected interactions from domains and linear motif binding.
+
+```python
+events.get_edges()
+
+```
+
+### Run nease enrichment on affected edges
+Main function of NEASE
+database: a list of pathway databases to run enrichment on it. Supported databases:
+database=  ['PharmGKB', 'HumanCyc', 'Wikipathways', 'Reactome','KEGG', 'SMPDB', 'Signalink','NetPath', 'EHMN', 'INOH','BioCarta','PID']
+
+```python
+events.enrich(database=['Reactome'])
+```
+
+
+### Run pathway specific analysis
+
+Functions to focus on a sinlge pathway
+ID: Pathway ID. You can find pathways id in the enrichment table results.
+
+```python
+events.path_analysis('R-HSA-112314')
+
+```
+
+Visualize the pathways/complexe: generate an HTML file with the network [example](https://tender-elion-977996.netlify.app/).
+ID: Pathway ID. You can find pathways id in the enrichment table results.
+file: A string representing a local file path for the html file.
+k: float  -  Float Position nodes using Fruchterman-Reingold force-directed algorithm is a parameter to be tuned by the user:.
+        Link: networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.spring_layout.html.
+    
+auto_open: Boolean 
+
+
+```python
+events.Vis_path("R-HSA-5674135",file='AS data/enrichment/',k=0.8)
+
+```
+
+
+
+
 ## Installation
 
 To install the package from PyPI please run:
