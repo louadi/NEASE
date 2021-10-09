@@ -151,7 +151,7 @@ events.path_analysis('R-HSA-112314')
 
 #### Visualize a pathway in the PPI:
 
-Generate an HTML file  visualizing the network [example](https://tender-elion-977996.netlify.app/).
+Generate an HTML file for visualizing the network [example](https://tender-elion-977996.netlify.app/).
 
 path_id: a string representing the Pathway ID.
 
