@@ -75,9 +75,9 @@ table: Data input as DataFrame object as explained in "Data input".
 
 input_type: Either "Standard",'Whippet','rmats','Dexeq'or "MAJIQ".
 
-```python
+``python
 events=nease.run(table, organism='Human',input_type='MAJIQ')
-```
+``
 
 
 ###  General functions
