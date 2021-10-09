@@ -11,6 +11,25 @@ Next, NEASE performs gene set overrepresentation analysis and identifies enriche
 ![alt text](https://user-images.githubusercontent.com/22538496/122232299-6a25cb00-cebb-11eb-8230-b16b6db81b01.png)
 
 
+
+## Installation
+
+To install the package from PyPI please run:
+
+`pip install nease` 
+
+To install the package from git:
+
+`git clone https://github.com/louadi/NEASE.git  && cd NEASE`
+
+`pip install .`
+
+
+Enjoy your instance of NEASE
+
+
+
+
 ## Data input
 
 The standard input of the package is a DataFrame object with the exon coordinates and Ensembl IDs of the genes (also recommended).
@@ -46,14 +65,20 @@ import pandas as pd
 ```
 
 
-Run NEASE 
+
+### Run NEASE 
+
 table: Data input as DataFrame object as explained in "Data input".
-input_type: Either "Standard","Spycone",'Whippet','rmats','Dexeq'or "MAJIQ".
+
+
+input_type: Either "Standard",'Whippet','rmats','Dexeq'or "MAJIQ".
 
 ```python
 events=nease.run(table, organism='Human',input_type='MAJIQ')
 ```
 
+
+###  General functions
 Get statstics of your data.
 
 ```python
@@ -63,11 +88,11 @@ events.get_stats()
 
 
 Get a list of all affected domains.
-
 ```python
 events.get_domains()
 
 ```
+
 
 
 Get a list of all affected linear motifs.
@@ -76,6 +101,7 @@ Get a list of all affected linear motifs.
 events.get_elm()
 
 ```
+
 
 
 Get a list of all affected residues and their interactions from the PDB.
@@ -93,31 +119,48 @@ events.get_edges()
 
 ```
 
-### Run nease enrichment on affected edges
+###  NEASE enrichment 
+
 Main function of NEASE
+
 database: a list of pathway databases to run enrichment on it. Supported databases:
-database=  ['PharmGKB', 'HumanCyc', 'Wikipathways', 'Reactome','KEGG', 'SMPDB', 'Signalink','NetPath', 'EHMN', 'INOH','BioCarta','PID']
+
 
 ```python
+# Supported databases:
+database=  ['PharmGKB', 'HumanCyc', 'Wikipathways', 'Reactome','KEGG', 'SMPDB', 'Signalink','NetPath', 'EHMN', 'INOH','BioCarta','PID']
+
+# Run enrichment
 events.enrich(database=['Reactome'])
 ```
 
 
-### Run pathway specific analysis
+###  Pathway specific analysis
 
-Functions to focus on a sinlge pathway
-ID: Pathway ID. You can find pathways id in the enrichment table results.
+Functions to focus on a sinlge pathway.
+
+
+path_id: Pathway ID. You can find pathways id in the enrichment table results.
+
 
 ```python
 events.path_analysis('R-HSA-112314')
 
 ```
 
-Visualize the pathways/complexe: generate an HTML file with the network [example](https://tender-elion-977996.netlify.app/).
-ID: Pathway ID. You can find pathways id in the enrichment table results.
+
+Visualize a pathway in the PPI: 
+
+generate an HTML file with the network [example](https://tender-elion-977996.netlify.app/).
+
+path_id: Pathway ID. You can find pathways id in the enrichment table results.
+
 file: A string representing a local file path for the html file.
-k: float  -  Float Position nodes using Fruchterman-Reingold force-directed algorithm is a parameter to be tuned by the user:.
-        Link: networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.spring_layout.html.
+
+k: float  -  Float Position nodes using Fruchterman-Reingold force-directed algorithm is a parameter to be tuned by the user
+        [more details](networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.spring_layout.html).
+       
+    
     
 auto_open: Boolean 
 
@@ -128,22 +171,6 @@ events.Vis_path("R-HSA-5674135",file='AS data/enrichment/',k=0.8)
 ```
 
 
-
-
-## Installation
-
-To install the package from PyPI please run:
-
-`pip install nease` 
-
-To install the package from git:
-
-`git clone https://github.com/louadi/NEASE.git  && cd NEASE`
-
-`pip install .`
-
-
-Enjoy your instance of NEASE
 
 
 
