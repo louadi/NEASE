@@ -23,7 +23,10 @@ network={}
 # The PPI
 PPI={}
 
+elm={}
+elm_interactions={}
 
+pdb={}
 
 here=os.path.dirname(__file__)
 
@@ -33,5 +36,8 @@ database_mapping['Human']= pd.read_pickle(os.path.join(here,"data/database/Human
 Pathways['Human']= pd.read_pickle(os.path.join(here,"data/pathways/pathways_human"))
 network['Human']=load_obj(os.path.join(here,'data/network/graph_human'))
 PPI['Human']=load_obj(os.path.join(here,'data/network/PPI_Human'))
+elm['Human']= pd.read_pickle(os.path.join(here,"data/database/elm"))
+elm_interactions['Human']= pd.read_pickle(os.path.join(here,"data/database/ELM_interactions"))
+pdb['Human']= pd.read_pickle(os.path.join(here,"data/database/pdb"))
 
 

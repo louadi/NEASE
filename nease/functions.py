@@ -11,10 +11,34 @@ import numpy as np
 
 # main functions for nease
       
-def exons_to_edges(mapped,G):
+def exons_to_edges(mapped,G,elm_interactions):
+    
         # check if domains have known interactions/binding:
         mapped['domain']=mapped['NCBI gene ID']+'/'+mapped['Pfam ID']
-        mapped['Interacting domain']=mapped['domain'].apply(lambda x: G.has_node(x))
+        
+        # domain in ddi
+        mapped['DDI']=mapped['domain'].apply(lambda x: G.has_node(x))
+        
+        
+        # domaimn in elm
+        mapped['elm']=mapped['domain'].apply(lambda x: x in  list(elm_interactions['interactor 2'].unique()))
+
+        
+        mapped['Interacting domain']=mapped.apply(lambda x: bool ( x['elm'] + x['DDI']) , axis=1)
+        
+        def interactiontypye(ddi,elm):
+            if (ddi & elm):
+                return "DDI and DMI"
+            elif ddi:
+                return "DDI"
+            elif elm:
+                 return "DMI"
+            
+                                                  
+        mapped['Interaction type']=mapped.apply(lambda x: interactiontypye(x['DDI'], x['elm']), axis=1)             
+                                                 
+        #mapped['Interacting domain']=mapped['domain'].apply(lambda x: G.has_node(x))
+        
         mapped=mapped.rename(columns={"max_change": "dPSI",
                                       "domain": "Domain ID"}).reset_index(drop=True) 
     
@@ -24,32 +48,88 @@ def exons_to_edges(mapped,G):
     
     
 
-def affected_edges(data,Join,mapping):
+def affected_edges(nease_data,Join,only_DDIs):
+    
+            data=nease_data.data
+            mapping=nease_data.mapping
+            elm_interactions=nease_data.elm_interactions
 
+            
+            
+            
             # get domains with DDIs
             interacting_domains=data[data['Interacting domain']]
 
 
 
             # Identify binding of affected domains = Edges in the PPI
-
-            t=lambda node: [  x for x in list(set([x.split('/')[0] for x in 
-                                            [n for n in Join.neighbors(node)] ])) ]
+            
+            
+            # helper function to search in ddi
+            #retun nothing in case there is no node in joint graph
+            def get_neighbors(graph,node):
+                try:
+                    return graph.neighbors(node)
+                except :
+                    return []
+            
+            
+            def get_elm(node):
+                
+                interactors=list(elm_interactions[elm_interactions['interactor 2']==node]['Interator gene 1'].unique())
+                return [str(x) for x in interactors]
+            
+                    
+            # search in DDI and ELM        
+            t=lambda node:  list(set(    [x.split('/')[0] for x in [n for n in get_neighbors(Join,node)]]     
+                                                      +  get_elm(node)    
+                                             ))
+            
             interacting_domains['Affected binding (NCBI)']=interacting_domains['Domain ID'].apply(t)
+            interacting_domains=interacting_domains.rename(columns={"Pfam ID": "Identifier"}).reset_index(drop=True) 
+            
+            
+            # get edges from elm nad pdb
+            if not only_DDIs:
+                
+                elm_affected=nease_data.elm_affected
+                pdb_affected=nease_data.pdb
 
-            #Convert IDs to names
-            c=lambda x: [ Entrez_to_name(gene,mapping) for gene in list(set(x))]
-            interacting_domains['Affected binding']=interacting_domains['Affected binding (NCBI)'].apply(c)
+                
+                # get elm edges
+                t=lambda x: [ str(x) for x in list(elm_interactions[elm_interactions['interactor 1']==x ]['Interator gene 2'].unique())]
+                elm_affected['Affected binding (NCBI)']=elm_affected['ID'].apply(t)
+                
+                # only elm with interactions
+                elm_affected=elm_affected[elm_affected['Affected binding (NCBI)'].map(lambda d: len(d)) > 0]
+                
+                
+                # get elm edges
 
-            # count number of affected PPI for every domain
-            count=lambda x: len(x)
-            interacting_domains['Number of affected interactions']=interacting_domains['Affected binding'].apply(count)
+                
+                
+                
+                if ~elm_affected.empty:
 
-    
+                    elm_affected=elm_affected.rename(columns={"ELMIdentifier": "Identifier",
+                                              "entrezgene": "NCBI gene ID"}).drop(columns=[ 'Gene stable ID','ID']).reset_index(drop=True) 
+
+                    
+
+
+
+                    interacting_domains=interacting_domains[['Gene name','NCBI gene ID','Identifier','dPSI','Affected binding (NCBI)']].append(elm_affected, ignore_index=True)
+
+
+            
             return interacting_domains
     
     
-def gene_to_edges(data):
+    
+    
+    
+    
+def gene_to_edges(data,pdb,only_DDIs):
     
     #For every gene get all edges
         gene_edges={}
@@ -58,10 +138,28 @@ def gene_to_edges(data):
             edges=[item for sublist in edges for item in sublist]
             
             gene_edges[gene]=list(set(edges))
+            
+        # get pdb interactions    
+        if not only_DDIs:
+            
+            for gene in pdb['NCBI gene ID'].unique():
+                    edges=pdb[pdb['NCBI gene ID']==gene]['entrezgene']
+                    edges=[item for sublist in edges for item in sublist]
+                    
+                    if gene in gene_edges:
+                        
+                        gene_edges[gene]=list(set(gene_edges[gene]+edges))
+                    else:
+                        gene_edges[gene]=list(set(edges))
+
+            
         return gene_edges
+        
     
     
-def pathway_enrichment(g2edges,paths, mapping,organism,p_value_cutoff):
+    
+    
+def pathway_enrichment(g2edges,paths, mapping,organism,p_value_cutoff,only_DDIs):
     # General enrichment analysis
     
     pathway_genes=[]
@@ -69,7 +167,17 @@ def pathway_enrichment(g2edges,paths, mapping,organism,p_value_cutoff):
     # For statistical test: edge enrichment
     # TO DO for mouse
     if organism=='Human':
-        n=52467
+        if only_DDIs:
+            n=52467
+            
+            #  every pathway degreee two sturctural PPIs and
+            # 'Degree in the structural PPI' : degree in ppi annotated with DDI.DMI/PDB
+            # 'Degree in the PPI/DDI' : degree in ppi annotated with DDI only
+            ppi_type='Degree in the PPI/DDI'
+
+        else:
+            n=60235
+            ppi_type='Degree in the structural PPI'
     
     # number of effected edges 
     affected_edges=len([item for sublist in g2edges.values() for item in sublist])
@@ -95,7 +203,7 @@ def pathway_enrichment(g2edges,paths, mapping,organism,p_value_cutoff):
         
         try:
             # get path total degree "p" and gene list
-            p=int(paths [paths['pathway']==path]['Degree in the structural PPI'])
+            p=int(paths [paths['pathway']==path][ppi_type])
             path_genes=list(paths [paths['pathway']==path]['entrez_gene_ids'])[0]
             
         except:
@@ -163,7 +271,7 @@ def pathway_enrichment(g2edges,paths, mapping,organism,p_value_cutoff):
 
 
 
-def single_path_enrich(path_id,Pathways,g2edges,mapping,organism):
+def single_path_enrich(path_id,Pathways,g2edges,mapping,organism,only_DDIs):
         
 
         
@@ -171,10 +279,16 @@ def single_path_enrich(path_id,Pathways,g2edges,mapping,organism):
         # For statistical test: edge enrichment
         # TO DO for mouse
         if organism=='Human':
-            n=52467 
+            if only_DDIs:
+                n=52467
+                ppi_type='Degree in the PPI/DDI'
+
+            else:
+                n=60235
+                ppi_type='Degree in the structural PPI'
+
             
-            
-        p=int(Pathways [Pathways['external_id']==path_id]['Degree in the structural PPI'])
+        p=int(Pathways [Pathways['external_id']==path_id][ppi_type])
         path_genes=list(Pathways [Pathways['external_id']==path_id]['entrez_gene_ids'])[0]
         
         #collect:
@@ -386,30 +500,34 @@ def extract_subnetwork(path_genes,
 # plot domains stats
 
 def stats_domains(affecting_percentage,
-                  binding_percentage, 
+                  number_of_features,
+                  domain_number,
+                  elm_number,
+                  pdb_number,
                   file_path):
+    
     
         # from https://matplotlib.org/stable/gallery/pie_and_polar_charts/bar_of_pie.html#sphx-glr-gallery-pie-and-polar-charts-bar-of-pie-py
         # make figure and assign axis objects
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 5))
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 7))
         fig.subplots_adjust(wspace=0)
 
         # pie chart parameters
-        ratios = [affecting_percentage, 1-affecting_percentage, ]
-        labels = ['Affecting a domain', 'Not affecting a domain']
-        explode = [0.1, 0]
+        ratios = [affecting_percentage, 1-affecting_percentage]
+        labels = ['Affecting protein features','Not affecting any feature']
+        explode = [0.1, 0,]
         # rotate so that first wedge is split by the x-axis
         angle = -180 * ratios[0]
         ax1.pie(ratios, autopct='%1.1f%%', startangle=angle,
                 labels=labels, explode=explode, shadow=True,)
-        ax1.set_title("Genes with AS affecting protein domains")
+        ax1.set_title("Genes with AS affecting protein features")
         # bar chart parameters
 
         xpos = 0
         bottom = 0
-        ratios = [binding_percentage, 1-binding_percentage]
+        ratios = [ round(elm_number/number_of_features, 2),round(pdb_number/number_of_features, 2),round(domain_number/number_of_features, 2)]
         width = .2
-        colors = ['#66b3ff','#ff9999',]
+        colors = ['#F0D0C8','#B09880','#9B412B']
 
         for j in range(len(ratios)):
             height = ratios[j]
@@ -419,8 +537,8 @@ def stats_domains(affecting_percentage,
             ax2.text(xpos, ypos, "%d%%" % (ax2.patches[j].get_height() * 100),
                      ha='center')
 
-        ax2.set_title('Domains with known interactions')
-        ax2.legend(('Yes', 'No'))
+        ax2.set_title('Affected features')
+        ax2.legend(('Linear motifs', 'Residues','Domains'))
         ax2.axis('off')
         ax2.set_xlim(- 2.5 * width, 2.5 * width)
 
@@ -448,7 +566,7 @@ def stats_domains(affecting_percentage,
         ax2.add_artist(con)
         con.set_linewidth(4)
         
-        file_path=os.path.join(os.path.dirname(file_path),'domains_stats.pdf')
+        file_path=os.path.join(os.path.dirname(file_path),'NEASE_stats.pdf')
 
         plt.savefig(file_path,format='pdf',bbox_inches='tight')
         plt.show()

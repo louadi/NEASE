@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 
 
 setup(name='nease',
-      version='1.0.1',
+      version='1.1.0',
       description='NEASE: A network-based approach for the enrichment of alternative splicing events',
       long_description=README,
       url='https://github.com/louadi/NEASE',
@@ -36,6 +36,7 @@ setup(name='nease',
         'statsmodels>=0.12.2',
         'gseapy>=0.10.4',
         'matplotlib>=3.4.1',
+        "mygene>=3.2.2",
     ],
 
 )

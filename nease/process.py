@@ -6,6 +6,8 @@ import networkx as nx
 import csv
 import re
 import collections
+import mygene
+
 
 
 pd.set_option('display.max_colwidth', 1000)
@@ -58,7 +60,9 @@ def splitDataFrameList(df,target_column):
 
 def process_standard (data,
                       mapping,
-                      min_delta):
+                      min_delta,
+                      only_DDIs,
+                      nease_data):
     
         # verify the input data format
         columns=data.columns
@@ -92,7 +96,13 @@ def process_standard (data,
 
 
         # map to domains by calculating the overlap of exon coordinate and domain
-        mapping_tb=pd.merge(data, mapping,   left_on=columns[0], right_on='Gene stable ID').drop_duplicates()    
+        mapping_tb=pd.merge(data, mapping,   left_on=columns[0], right_on='Gene stable ID').drop_duplicates()   
+        
+        elm_affected,pdb_affected=[],[]
+        # map to pdb and elm    
+        if not only_DDIs:
+                
+                elm_affected,pdb_affected=get_interfaces(data,nease_data,min_delta,overlap_cal=True)
         
         
         # get all coding genes affected by splicing
@@ -115,8 +125,9 @@ def process_standard (data,
                 print('Delta PSI column was not found. Proceeding with all events (no filtering)')
                 mapping_tb['max_change']='-'
                 
-                
-    
+
+
+        
         
         # any overlap is considered
         mapping_tb['overl']=mapping_tb[["Genomic coding start", columns[1]]].max(axis=1) <= mapping_tb[["Genomic coding end", columns[2]]].min(axis=1)
@@ -139,7 +150,7 @@ def process_standard (data,
         #mapping_tb=mapping_tb.groupby(['Gene name','NCBI gene ID','Gene stable ID','Exon stable ID','Pfam ID']).max()['max_change']
 
         
-        return mapping_tb,spliced_genes
+        return mapping_tb,spliced_genes,elm_affected,pdb_affected
 
 
 
@@ -183,7 +194,7 @@ def process_spycone (spycone,
         
         
       
-        return mapping_tb,spliced_genes
+        return mapping_tb,spliced_genes,elm_affected,pdb_affected
 
 
 
@@ -191,8 +202,10 @@ def process_spycone (spycone,
 # Majiq output
 def process_MAJIQ(data,
                   mapping,
-                  Majiq_confidence=0.95, 
-                  min_delta=0.05 ):
+                  Majiq_confidence, 
+                  min_delta,
+                  only_DDIs,
+                  nease_data):
         try:     
             
             # extract exon skipping events:
@@ -300,15 +313,33 @@ def process_MAJIQ(data,
                 data=data  [ [ 'Gene ID','E(dPSI) per LSV junction' , 'Junctions coords','P(|dPSI|>=0.20) per LSV junction','delta','targets','source' ]]
 
                 data['targets']=data['targets'].astype(int)
-
-
+                
+                
+                
+                
+                    
                 #Map exons to domain
                 mapping_tb=pd.merge(mapping, data,  left_on='Genomic coding start', right_on='targets')
-                
 
 
                 #check if the mapping based on coordinate match the gene ID provided from Majiq
                 mapping_tb=mapping_tb[mapping_tb['Gene ID']==mapping_tb['Gene stable ID']]
+                
+                
+                
+                
+                
+                
+                elm_affected,pdb_affected=[],[]                
+                if not only_DDIs:
+                        # map to pdb and elm
+                        elm_affected,pdb_affected=get_interfaces(data,nease_data,overlap_cal=False)
+                        
+                        
+                        
+                        
+                    
+                
 
                 m= lambda x: max(list(x))
                 mapping_tb['max_change']=mapping_tb['delta'].apply(m)
@@ -328,22 +359,125 @@ def process_MAJIQ(data,
 
 
 
-
+    
                 mapping_tb=mapping_tb[['Gene name','NCBI gene ID','Gene stable ID','Exon stable ID','Pfam ID','max_change']].drop_duplicates()
 
 
                 print('MAJIQ output converted successfully to NEASE format.')
 
 
-        return mapping_tb,spliced_genes
+        return mapping_tb,spliced_genes,elm_affected,pdb_affected
+    
+    
+    
+    
+    
+    
+    
+def get_interfaces(data,nease_data,min_delta=.05,overlap_cal=True):
+    
+    # data: list of exons to map
+    if overlap_cal:
+        
+        
+            columns=data.columns
+            
+            #merge with elm table
+            elm_mapped=pd.merge(data,nease_data.elm,   left_on=columns[0], right_on='Gene stable ID').drop_duplicates()
+            
+            
+            #merge with pdb table
+            pdb_mapped=pd.merge(data,nease_data.pdb,   left_on=columns[0], right_on='Gene stable ID').drop_duplicates()
+            
+        
+            if ~elm_mapped.empty:
+                 # any overlap is considered
+                elm_mapped['overl']=elm_mapped[["Genomic coding start", columns[1]]].max(axis=1) <= elm_mapped[["Genomic coding end",columns[2] ]].min(axis=1)
+                pdb_mapped['overl']=pdb_mapped[["Genomic coding start", columns[1]]].max(axis=1) <= pdb_mapped[["Genomic coding end",columns[2] ]].min(axis=1)
+
+
+
+                elm_mapped=elm_mapped[elm_mapped['overl']].drop_duplicates()
+                pdb_mapped=pdb_mapped[pdb_mapped['overl']].drop_duplicates()
+                
+                try:
+                            #try to get the delta PSI from the user input
+                    elm_mapped['dPSI']=elm_mapped[columns[3]].astype(float)
+                    pdb_mapped['dPSI']=pdb_mapped[columns[3]].astype(float)
+
+
+                            # significance filter (delta PSI)
+                    elm_mapped=elm_mapped[elm_mapped['dPSI'].abs()>=min_delta]
+                    pdb_mapped=pdb_mapped[pdb_mapped['dPSI'].abs()>=min_delta]
+
+                except:
+                        # No delta PSI given
+
+                        elm_mapped['dPSI']='-'
+                        pdb_mapped['dPSI']='-'
+
+
+
+
+                elm_mapped=elm_mapped[['Gene stable ID','entrezgene','ELMIdentifier','dPSI']].drop_duplicates()
+                
+                
+
+                  
+    
+    else:
+            #no overal: direct mapping of junctions (Majiq output)
+            # already filtered by signifcant
+            elm_mapped=pd.merge(nease_data.elm, data,  left_on='Genomic coding start', right_on='targets')
+            pdb_mapped=pd.merge(nease_data.pdb, data,  left_on='Genomic coding start', right_on='targets')
+                
+                
+
+            if ~elm_mapped.empty:
+                #check if the mapping based on coordinate match the gene ID provided from Majiq
+                elm_mapped=elm_mapped[elm_mapped['Gene ID']==elm_mapped['Gene stable ID']]
+                pdb_mapped=pdb_mapped[pdb_mapped['Gene ID']==pdb_mapped['Gene stable ID']]
+
+
+                m= lambda x: max(list(x))
+                elm_mapped['dPSI']=elm_mapped['delta'].apply(m)
+                pdb_mapped['dPSI']=pdb_mapped['delta'].apply(m)
+
+                
+                
+    #convert 
+    elm_mapped['Gene name']=elm_mapped['entrezgene'].apply(lambda x: Entrez_to_name(str(x),nease_data.mapping))
+    elm_mapped['ID']=elm_mapped['entrezgene'].astype("str")+"/"+elm_mapped['ELMIdentifier'].astype("str")
+    elm_mapped=elm_mapped[['Gene name','entrezgene','Gene stable ID','ELMIdentifier','dPSI','ID']].drop_duplicates()
+        
+    
+    
+    pdb_mapped=(pdb_mapped.dropna().groupby(["symbol",'Gene stable ID'])["entrezgene"].agg(list)).sort_values(ascending=False).reset_index(name='entrezgene')
+    pdb_mapped['entrezgene']=pdb_mapped['entrezgene'].apply(lambda x: list(set(x)))
+    pdb_mapped['NCBI gene ID']=pdb_mapped['symbol'].apply(lambda x: name_to_entrez(str(x),nease_data.mapping))
+    pdb_mapped['NCBI gene ID']=pdb_mapped['NCBI gene ID'].astype('str')
     
 
+    
+    return elm_mapped,pdb_mapped
+    
+    
 
     
 # Functions to convert IDs 
 def Entrez_to_name(gene,mapping):
     try:
-        return mapping[mapping['NCBI gene ID']==int(gene)]['Gene name'].unique()[0]
+        name=mapping[mapping['NCBI gene ID']==int(gene)]['Gene name'].unique()
+        
+        if len(name)==0:
+            
+            # try to convert it online
+            mg = mygene.MyGeneInfo()
+            out = mg.querymany(str(gene), scopes="entrezgene", fields='symbol', species="human", verbose=False, as_dataframe = True,
+                  df_index = True)
+            name=out['symbol']
+        
+        return name[0]
     
     except :
         return gene
@@ -351,7 +485,35 @@ def Entrez_to_name(gene,mapping):
     
 def Ensemb_to_entrez(gene,mapping):
     try:
-        return mapping[mapping['Gene stable ID']==gene]['NCBI gene ID'].unique()[0]
+        entrez=mapping[mapping['Gene stable ID']==gene]['NCBI gene ID'].unique()
+            
+        if len(entrez)==0:
+            # try to convert it online
+            mg = mygene.MyGeneInfo()
+            out = mg.querymany(gene, scopes="ensembl.gene", fields='entrezgene', species="human", verbose=False, as_dataframe = True,
+                  df_index = True)
+            entrez=out['entrezgene']
+            
+        return str(entrez[0])
     
     except :
         return gene
+    
+    
+# Functions to convert IDs 
+def name_to_entrez(gene,mapping):
+    try:
+        name=mapping[mapping['Gene name']==str(gene)]['NCBI gene ID'].unique()
+
+        
+        if len(name)==0:
+            # try to convert it online
+            mg = mygene.MyGeneInfo()
+            out = mg.querymany(str(gene), scopes="symbol", fields='entrezgene', species="human", verbose=False, as_dataframe = True,
+                  df_index = True)
+            name=out['symbol']
+        
+        return name[0]
+    
+    except :
+        return str(gene)
