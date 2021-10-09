@@ -86,7 +86,7 @@ events=nease.run(table, organism='Human',input_type='MAJIQ')
 
 
 ###  General functions
-Get statstics of your data.
+Get statistics of your data.
 
 ```python
 events.get_stats()
@@ -123,7 +123,7 @@ events.get_edges()
 
 ###  NEASE enrichment 
 
-Main function of NEASE
+The main function of NEASE
 
 database: a list of pathway databases to run enrichment on it. 
 
@@ -151,11 +151,11 @@ events.path_analysis('R-HSA-112314')
 
 #### Visualize a pathway in the PPI:
 
-Generate an HTML file with the network [example](https://tender-elion-977996.netlify.app/).
+Generate an HTML file  visualizing the network [example](https://tender-elion-977996.netlify.app/).
 
 path_id: a string representing the Pathway ID.
 
-file: A string representing a local file path for the html file.
+file: A string representing a local file path for the HTML file.
 
 k: float  -  A Float for the algorithm  Fruchterman-Reingold force-directed for nodes positions to be tuned by the user. You might need to run the functions multiple times for the optimal visualizations.
         [more details](https://networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.spring_layout.html).
