@@ -40,14 +40,6 @@ The standard input of the package is a DataFrame object with the exon coordinate
 
 
 
-| Gene              |   Start   |   End     |dpsi  | 
-|-------------------|-----------|-----------|------|
-| ENSG00000154263   | 69314431  | 69315425  |-0.10 | 
-| ENSG00000154265   | 87411893  | 87412033  | 0.13 | 
-
-
-
-
 The package also supports the output of multiple AS differential detection tools such as rMATs, Whippet and MAJIQ.
 
 
