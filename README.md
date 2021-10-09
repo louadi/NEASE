@@ -107,7 +107,6 @@ Get a list of all affected residues and their interactions from the PDB.
 
 ```python
 events.get_pdb()
-
 ```
 
 
@@ -115,7 +114,6 @@ List of affected interactions from domains and linear motif binding.
 
 ```python
 events.get_edges()
-
 ```
 
 ###  NEASE enrichment 
@@ -143,7 +141,6 @@ path_id: Pathway ID. You can find pathways id in the enrichment table results.
 
 ```python
 events.path_analysis('R-HSA-112314')
-
 ```
 
 
@@ -161,7 +158,6 @@ k: float  -  A Float for the algorithm  Fruchterman-Reingold force-directed for 
 
 ```python
 events.Vis_path("R-HSA-5674135",file='AS data/enrichment/',k=0.8)
-
 ```
 
 
