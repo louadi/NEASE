@@ -48,7 +48,9 @@ The standard input of the package is a DataFrame object with the exon coordinate
 
 
 
-The package also supports the output of multiple AS differential detection tools such as rMATs, Whippet and MAJIQ [55] where NEASE only considers annotated exons. 
+The package also supports the output of multiple AS differential detection tools such as rMATs, Whippet and MAJIQ.
+
+
 If you need help with your tool or need to add the support of more tools, please contact us.
 
 
@@ -157,7 +159,7 @@ path_id: a string representing the Pathway ID.
 file: A string representing a local file path for the html file.
 
 k: float  -  A Float for the algorithm  Fruchterman-Reingold force-directed for nodes positions to be tuned by the user. You might need to run the functions multiple times for the optimal visualizations.
-        [more details](networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.spring_layout.html).
+        [more details](https://networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.spring_layout.html).
        
 
 ```python
