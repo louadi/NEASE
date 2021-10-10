@@ -5,9 +5,6 @@ NEASE  (Network Enrichment method for Alternative Splicing Events) a tool for fu
 ## General info
 The python package NEASE (Network-based Enrichment method for Alternative Splicing Events) first detects protein features affected by AS such as domains, motifs and residues. Next, NEASE uses  a protein-protein interactions integrated with domain-domain interactions, residue-level and domain-motif interactions to identify interaction partners likely affected by AS
 
-
-an integrated protein-protein interactions with domain-domain interactions and domain-motif interactions network to identify protein interaction partners likely affected by AS. 
-
 Next, NEASE performs gene set overrepresentation analysis and identifies enriched pathways based on affected edges. Furthermore, since the statistical approach is network-based, it also prioritizes (differentially) spliced genes and finds new disease biomarkers candidates in case of aberrant splicing.
 
 
