@@ -134,7 +134,7 @@ events.enrich(database=['Reactome'])
 
 
 #### Get list of genes affecting pathways and their statistics
-path_id: Pathway ID. You can find pathways id in the enrichment table results.
+path_id: a string representing the Pathway ID. You can find pathways id in the enrichment table results.
 
 
 ```python
@@ -148,9 +148,9 @@ Generate an HTML file for visualizing the network [example](https://tender-elion
 
 path_id: a string representing the Pathway ID.
 
-file: A string representing a local file path for the HTML file.
+file: a string representing a local file path for the HTML file.
 
-k: A Float for the algorithm  Fruchterman-Reingold force-directed for nodes positions, to be tuned by the user. You might need to run the following function multiple times for an optimal visualizations.
+k: a Float for the algorithm  Fruchterman-Reingold force-directed for nodes positions, to be tuned by the user. You might need to run the following function multiple times for an optimal visualizations.
         [more details](https://networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.spring_layout.html).
        
 
