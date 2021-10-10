@@ -72,7 +72,7 @@ import pandas as pd
 table: Data input as DataFrame object as explained in "Data input".
 
 
-input_type: Either "Standard",'Whippet','rmats'or "MAJIQ".
+input_type: Either 'Standard', 'Whippet', 'rmats'or "MAJIQ".
 
 ```python
 events=nease.run(table, organism='Human',input_type='MAJIQ')
