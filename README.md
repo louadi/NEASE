@@ -32,7 +32,8 @@ Enjoy your instance of NEASE
 
 ## Data input
 
-The standard input of the package is a DataFrame object with the exon coordinates and Ensembl IDs of the genes (also recommended).
+The standard input of the package (also the recommended) is a DataFrame object with Ensembl IDs of the genes and the exon coordinates from human genome build hg38 (GRCh38).
+
 - First column  - genes IDs (Only Ensembl gene IDs can be used).
 - Second column - start of the exon coordinate.
 - Third column  - end of the exon coordinate.
