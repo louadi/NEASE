@@ -33,16 +33,10 @@ Enjoy your instance of NEASE
 ## Data input
 
 The standard input of the package is a DataFrame object with the exon coordinates and Ensembl IDs of the genes (also recommended).
-- first column  - genes IDs (Only Ensembl gene IDs can be used).
+- First column  - genes IDs (Only Ensembl gene IDs can be used).
 - Second column - start of the exon coordinate.
 - Third column  - end of the exon coordinate.
 - Fourth column - dPSI (optionally)
-
-
-
-
-
-
 
 
 
@@ -55,8 +49,7 @@ The standard input of the package is a DataFrame object with the exon coordinate
 
 The package also supports the output of multiple AS differential detection tools such as rMATs, Whippet and MAJIQ.
 
-
-If you need help with your tool or need to add the support of more tools, please contact us.
+If you need help with your data or need to add support for another tools, please contact us.
 
 
 
@@ -78,7 +71,7 @@ import pandas as pd
 table: Data input as DataFrame object as explained in "Data input".
 
 
-input_type: Either "Standard",'Whippet','rmats','Dexeq'or "MAJIQ".
+input_type: Either "Standard",'Whippet','rmats'or "MAJIQ".
 
 ```python
 events=nease.run(table, organism='Human',input_type='MAJIQ')
