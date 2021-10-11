@@ -73,7 +73,9 @@ table: Data input as DataFrame object as explained in "Data input".
 
 
 input_type: Either 'Standard', 'Whippet', 'rmats'or "MAJIQ".
-only_DDIs: Only use DDI annotations (No PDB and ELM)
+
+only_DDIs: Only use DDI annotations (No PDB and ELM).
+
 
 ```python
 events=nease.run(table, organism='Human',input_type='MAJIQ',only_DDIs=False)
@@ -164,7 +166,9 @@ events.Vis_path("R-HSA-5674135",file='AS data/enrichment/',k=0.8)
 
 
 ###  Classic gene set enrichment (Gene level)
+
 gseapy_databases: gseapy pathways databases
+
 non_symmetrical_only: Run classical gene set enrichment for only non-symmetrical alternative exons, that are likely to cause NMD
 
 ```python
