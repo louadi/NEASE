@@ -41,7 +41,7 @@ class run(object):
             
             input_type: str, optional
                 
-                Either "Standard","Spycone",'Whippet','rmats','spladder' or "MAJIQ", If you need support of more types of outputs. Please contact: louadi@wzw.tum.de
+                Either "Standard","Spycone",'Whippet','rmats','Dexeq'or "MAJIQ", If you need support of more types of outputs. Please contact: louadi@wzw.tum.de
                 
             p_value_cutoff: float, optional
                The p value cutoff used to compute NEASE scores. (default is 0.05)
@@ -69,7 +69,6 @@ class run(object):
             
         else:
         
-            # TO DO
             
             #Open the Join graph and databases of the selected organism:
             Join=network[organism]
@@ -78,6 +77,7 @@ class run(object):
             self.ppi=PPI[organism]
             self.only_DDIs=only_DDIs
             self.elm_interactions=elm_interactions[organism]
+            self.input_type=input_type
 
             if not only_DDIs:
                 
@@ -103,14 +103,14 @@ class run(object):
             
             elif input_type=='Standard':
                     
-                try:
-                    self.data,self.spliced_genes,self.elm_affected,self.pdb_affected=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self)
+                #try:
+                    self.data,self.spliced_genes,self.elm_affected,self.pdb_affected,self.symetric_genes=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self)
                     if len(self.data)==0:
                         print('Found no overlap with protein domains.')
                         print('Make sure that the genomic coordinates of the exons correspond to the human genome build hg38 (GRCh38).')
 
                     
-                except:
+                #except:
                         print('Could not recognize the standard format. Please make sure your table matches the standard format.')
                         print('Gene ensembl ID          EXON START        EXON END          dPSI (optional)')
                         print('Make sure that the genomic coordinates of the exons correspond to the human genome build hg38 (GRCh38).')
@@ -126,7 +126,7 @@ class run(object):
                     data['end']=data['tmp'].apply(lambda x: x.split('-')[1])
                     data=data[['Gene ID' , 'start','end','DeltaPsi']]
 
-                    self.data,self.spliced_genes,self.elm_affected,self.pdb_affected=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self)
+                    self.data,self.spliced_genes,self.elm_affected,self.pdb_affected,self.symetric_genes=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self)
                     
                 except:
                         print('process failed....Try to use the Standard input')
@@ -140,7 +140,7 @@ class run(object):
                             data=data[['GeneID','exonStart_0base','exonEnd','IncLevelDifference']]
                             
 
-                            self.data,self.spliced_genes,self.elm_affected,self.pdb_affected=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self)
+                            self.data,self.spliced_genes,self.elm_affected,self.pdb_affected,self.symetric_genes=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self)
 
                 except:
                         print('process failed....Try to use the Standard input')
@@ -153,7 +153,7 @@ class run(object):
                             data=data[data['padj']<=p_value_cutoff]
                             data=data[[data.columns[0],'genomicData.start','genomicData.end','log2fold_control_case']]
                             print('proceding with log2fold threshold: '+str(min_delta))
-                            self.data,self.spliced_genes,self.elm_affected,self.pdb_affected=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self)
+                            self.data,self.spliced_genes,self.elm_affected,self.pdb_affected,self.symetric_genes=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self)
 
                 except:
                         print('process failed....Try to use the Standard input')
@@ -449,7 +449,8 @@ class run(object):
     
     def classic_enrich(self,
                        gseapy_databases,
-                       outdir='Enrichr_gseapy', ):
+                       outdir='Enrichr_gseapy',
+                       non_symmetrical_only=False):
         
         '''
         Classic gene level enrichement using the python library gseapy.
@@ -458,6 +459,9 @@ class run(object):
         ---------- 
         gseapy_databases: str, list, tuple of Enrichr Library name(s). 
                   or custom defined gene_sets (dict, or gmt file). For more details, please check: https://pypi.org/project/gseapy/ 
+                  
+        non_symmetrical_only: Bool 
+                    Run classic gene set enrichment only on non_symmetrical exons.
 
          Returns
         -------
@@ -486,9 +490,20 @@ class run(object):
                 
             else:
             
-                # run gene set enrichment 
+                # run gene set enrichment
                 
-                gene_list=[ Entrez_to_name(x,self.mapping) for x in self.spliced_genes]
+                if non_symmetrical_only:
+                    if self.input_type=="Majiq":
+                        print('Non-symmetrical exons enrichment is not available for Majiq output. Please use standard input. ')
+                        
+                    else:
+                        # run only on non-symteric
+                        gene_list=[ Entrez_to_name(x,self.mapping) for x in self.symetric_genes]
+                else:     
+                     # run on all genes
+                     gene_list=[ Entrez_to_name(x,self.mapping) for x in self.spliced_genes]
+                        
+                        
                 enr=gp.enrichr(gene_list=gene_list,organism=self.organism,gene_sets=gene_set_database,outdir=outdir)
 
                 return enr.results.sort_values('Adjusted P-value')
