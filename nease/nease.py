@@ -41,7 +41,7 @@ class run(object):
             
             input_type: str, optional
                 
-                Either "Standard","Spycone",'Whippet','rmats','Dexeq'or "MAJIQ", If you need support of more types of outputs. Please contact: louadi@wzw.tum.de
+                Either "Standard","Spycone",'Whippet','rmats','DEXSeq'or "MAJIQ", If you need support of more types of outputs. Please contact: louadi@wzw.tum.de
                 
             p_value_cutoff: float, optional
                The p value cutoff used to compute NEASE scores. (default is 0.05)
@@ -64,7 +64,7 @@ class run(object):
             print('Error: Please choose one of the  supported  organism: "Human" and "Mouse".')
         
          
-        if input_type!='MAJIQ' and input_type!='Standard' and input_type!='Spycone' and input_type!='Whippet' and input_type!='rmats' and input_type!='Dexeq':
+        if input_type!='MAJIQ' and input_type!='Standard' and input_type!='Spycone' and input_type!='Whippet' and input_type!='rmats' and input_type!='DEXSeq':
             raise ValueError('Input type not supported')
             
         else:
@@ -146,7 +146,7 @@ class run(object):
                         print('process failed....Try to use the Standard input')
                         
                         
-            elif input_type=='Dexeq':  
+            elif input_type=='DEXSeq':  
                 
                 try:
                             
