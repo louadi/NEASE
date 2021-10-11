@@ -93,7 +93,9 @@ def process_standard (data,
                             data[columns[2]]=data[columns[2]].astype(int)
                 except:
                     raise ValueError('Could not find exons coordinates. Please make sure that the second column corresponds to the exon start and the third to the exon end (hg38).')
-
+        
+        
+        data['symetric']=data.apply(lambda x: abs(x[columns[1]]- x[columns[2]])%3==0, axis=1)
 
         # map to domains by calculating the overlap of exon coordinate and domain
         mapping_tb=pd.merge(data, mapping,   left_on=columns[0], right_on='Gene stable ID').drop_duplicates()   
@@ -109,6 +111,9 @@ def process_standard (data,
         # Only genes with Pfam domain will be considred here
         # NCBI id used here for the network visualization
         spliced_genes=list(mapping_tb['NCBI gene ID'].unique())
+        
+        # only symetric genes                                            
+        symetric_genes=list(mapping_tb[~mapping_tb['symetric']]['NCBI gene ID'].unique())
 
         if len(mapping_tb)==0:
             return []
@@ -150,7 +155,7 @@ def process_standard (data,
         #mapping_tb=mapping_tb.groupby(['Gene name','NCBI gene ID','Gene stable ID','Exon stable ID','Pfam ID']).max()['max_change']
 
         
-        return mapping_tb,spliced_genes,elm_affected,pdb_affected
+        return mapping_tb,spliced_genes,elm_affected,pdb_affected,symetric_genes
 
 
 
