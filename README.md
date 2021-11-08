@@ -8,7 +8,7 @@ The python package NEASE (Network-based Enrichment method for Alternative Splici
 Next, NEASE performs gene set overrepresentation analysis and identifies enriched pathways based on affected edges. Furthermore, since the statistical approach is network-based, it also prioritizes (differentially) spliced genes and finds new disease biomarkers candidates in case of aberrant splicing.
 
 
-![alt text](https://user-images.githubusercontent.com/22538496/122232299-6a25cb00-cebb-11eb-8230-b16b6db81b01.png)
+![alt text](https://i.imgur.com/5QPhUw3.png)
 
 
 
@@ -76,11 +76,11 @@ input_type: Either 'Standard', 'Whippet', 'rmats'or "MAJIQ".
 
 remove_non_in_frame: Remove exons that are predicted to disturb the ORF ([Prediction source](https://vastdb.crg.eu/wiki/FAQ#:~:text=positions%20were%20analyzed.-,How%20is%20the%20impact%20on%20the%20ORF%20predicted%3F,-The%20pipeline%20to)). 
 
-only_divisible_by_3: remove exons not divisible by 3.
+only_divisible_by_3: Remove exons not divisible by 3.
 
 only_DDIs: Only use DDI annotations (No PDB and ELM).
 
- p_value_cutoff: the enrichment p-value cutoff.
+ p_value_cutoff: The enrichment p-value cutoff.
  
 
 ```python
