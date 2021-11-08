@@ -74,7 +74,7 @@ table: Data input as DataFrame object as explained in "Data input".
 
 input_type: Either 'Standard', 'Whippet', 'rmats'or "MAJIQ".
 
-remove_non_in_frame: Remove exons that are predicted to disturb the ORF([Prediction source](https://vastdb.crg.eu/wiki/FAQ#:~:text=positions%20were%20analyzed.-,How%20is%20the%20impact%20on%20the%20ORF%20predicted%3F,-The%20pipeline%20to)). 
+remove_non_in_frame: Remove exons that are predicted to disturb the ORF ([Prediction source](https://vastdb.crg.eu/wiki/FAQ#:~:text=positions%20were%20analyzed.-,How%20is%20the%20impact%20on%20the%20ORF%20predicted%3F,-The%20pipeline%20to)). 
 
 only_divisible_by_3: remove exons not divisible by 3.
 
@@ -84,7 +84,8 @@ only_DDIs: Only use DDI annotations (No PDB and ELM).
  
 
 ```python
-events=nease.run(table, organism='Human',input_type='MAJIQ',only_DDIs=False, remove_non_in_frame=True, only_divisible_by_3=False)
+events=nease.run(table, organism='Human',input_type='Standard',
+                 remove_non_in_frame=True, only_divisible_by_3=False)
 ```
 
 
