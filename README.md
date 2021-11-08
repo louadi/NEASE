@@ -47,6 +47,7 @@ The standard input of the package (also the recommended) is a DataFrame object w
 | ENSG00000154265   | 87411893  | 87412033  | 0.13 | 
 
 
+In the case of differential splicing analysis, please make sure to filter events by significance before, for example using a p-value cutoff. 
 
 The package also supports the output of multiple AS differential detection tools such as rMATs, Whippet and MAJIQ.
 
@@ -73,12 +74,13 @@ table: Data input as DataFrame object as explained in "Data input".
 
 
 input_type: Either 'Standard', 'Whippet', 'rmats'or "MAJIQ".
-
+remove_non_in_frame: Remove exons that are predicted to disturb the ORF or known to result in a non-coding gene ([Prediction source](https://vastdb.crg.eu/wiki/FAQ#:~:text=positions%20were%20analyzed.-,How%20is%20the%20impact%20on%20the%20ORF%20predicted%3F,-The%20pipeline%20to)). 
+only_divisible_by_3: remove exons not divisible by 3.
 only_DDIs: Only use DDI annotations (No PDB and ELM).
-
+ p_value_cutoff: the enrichment p-value cutoff
 
 ```python
-events=nease.run(table, organism='Human',input_type='MAJIQ',only_DDIs=False)
+events=nease.run(table, organism='Human',input_type='MAJIQ',only_DDIs=False, remove_non_in_frame=True, only_divisible_by_3=False)
 ```
 
 

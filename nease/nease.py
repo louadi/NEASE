@@ -16,6 +16,8 @@ class run(object):
                  organism='Human',
                  input_type='Standard',
                  p_value_cutoff=0.05,
+                 remove_non_in_frame=True,
+                 only_divisible_by_3=False,
                  min_delta=0.05,
                  Majiq_confidence=0.95,
                  only_DDIs=False
@@ -45,7 +47,13 @@ class run(object):
                 
             p_value_cutoff: float, optional
                The p value cutoff used to compute NEASE scores. (default is 0.05)
-            
+               
+            remove_non_in_frame: boolean, default: True
+                   If True remove all exons that are predicted to disturb the ORF or known to result in a non-coding gene. If you would like to change this option and include all exons, please change the parameter remove_non_in_frame to False.
+           
+           only_divisible_by_3: boolean, default: False
+                    If True remove exons not divisible by 3
+             
             min_delta: float, optional
                 min delta to consider in case your input has dPsi column. The value also corresponds  to logfold change in case of Dexeq.   (default is 0.05)
             
@@ -85,7 +93,7 @@ class run(object):
                 self.elm_interactions=elm_interactions[organism]
                 self.pdb=pdb[organism]
             
-            
+            self.non_coding=non_coding
             self.data=[]
             self.spliced_genes=[]
             
@@ -103,14 +111,14 @@ class run(object):
             
             elif input_type=='Standard':
                     
-                #try:
-                    self.data,self.spliced_genes,self.elm_affected,self.pdb_affected,self.symetric_genes=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self)
+                try:
+                    self.data,self.spliced_genes,self.elm_affected,self.pdb_affected,self.symetric_genes=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self,remove_non_in_frame,only_divisible_by_3)
                     if len(self.data)==0:
                         print('Found no overlap with protein domains.')
                         print('Make sure that the genomic coordinates of the exons correspond to the human genome build hg38 (GRCh38).')
 
                     
-                #except:
+                except:
                         print('Could not recognize the standard format. Please make sure your table matches the standard format.')
                         print('Gene ensembl ID          EXON START        EXON END          dPSI (optional)')
                         print('Make sure that the genomic coordinates of the exons correspond to the human genome build hg38 (GRCh38).')
@@ -126,7 +134,7 @@ class run(object):
                     data['end']=data['tmp'].apply(lambda x: x.split('-')[1])
                     data=data[['Gene ID' , 'start','end','DeltaPsi']]
 
-                    self.data,self.spliced_genes,self.elm_affected,self.pdb_affected,self.symetric_genes=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self)
+                    self.data,self.spliced_genes,self.elm_affected,self.pdb_affected,self.symetric_genes=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self,remove_non_in_frame,only_divisible_by_3)
                     
                 except:
                         print('process failed....Try to use the Standard input')
@@ -140,7 +148,7 @@ class run(object):
                             data=data[['GeneID','exonStart_0base','exonEnd','IncLevelDifference']]
                             
 
-                            self.data,self.spliced_genes,self.elm_affected,self.pdb_affected,self.symetric_genes=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self)
+                            self.data,self.spliced_genes,self.elm_affected,self.pdb_affected,self.symetric_genes=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self,remove_non_in_frame,only_divisible_by_3)
 
                 except:
                         print('process failed....Try to use the Standard input')
@@ -153,7 +161,7 @@ class run(object):
                             data=data[data['padj']<=p_value_cutoff]
                             data=data[[data.columns[0],'genomicData.start','genomicData.end','log2fold_control_case']]
                             print('proceding with log2fold threshold: '+str(min_delta))
-                            self.data,self.spliced_genes,self.elm_affected,self.pdb_affected,self.symetric_genes=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self)
+                            self.data,self.spliced_genes,self.elm_affected,self.pdb_affected,self.symetric_genes=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self,remove_non_in_frame,only_divisible_by_3)
 
                 except:
                         print('process failed....Try to use the Standard input')
@@ -341,7 +349,7 @@ class run(object):
         else:
             
             #DIGGER visualization available for Human
-            return self.data.drop(columns=[ 'Domain ID','DDI','elm'])
+            return self.data.drop(columns=[ 'Domain ID','DDI','elm']).reset_index(drop=True)
     
     
     
@@ -367,7 +375,7 @@ class run(object):
         else:
             self.elm_affected['ELM link']='http://elm.eu.org/elms/'+self.elm_affected.ELMIdentifier.astype('str')
             
-            return self.elm_affected.drop(columns=[ 'ID','Affected binding (NCBI)'])
+            return self.elm_affected.drop(columns=[ 'ID','Affected binding (NCBI)']).reset_index(drop=True)
            
         
     def get_pdb(self):
@@ -400,7 +408,7 @@ class run(object):
             pdb_affected['Co-resolved interactions']=pdb_affected['Co-resolved interactions'].apply(a)
             pdb_affected['Co-resolved interactions symbol']=pdb_affected['Co-resolved interactions symbol'].apply(a)
             
-            return pdb_affected[['Gene name','NCBI gene ID','Gene stable ID','Co-resolved interactions symbol','Co-resolved interactions']]
+            return pdb_affected[['Gene name','NCBI gene ID','Gene stable ID','Co-resolved interactions symbol','Co-resolved interactions']].reset_index(drop=True)
         
         
         
@@ -498,10 +506,10 @@ class run(object):
                         
                     else:
                         # run only on non-symteric
-                        gene_list=[ Entrez_to_name(x,self.mapping) for x in self.symetric_genes]
+                        gene_list=[ Ensemb_to_name(x,self.mapping) for x in self.symetric_genes]
                 else:     
                      # run on all genes
-                     gene_list=[ Entrez_to_name(x,self.mapping) for x in self.spliced_genes]
+                     gene_list=[ Ensemb_to_name(x,self.mapping) for x in self.spliced_genes]
                         
                         
                 enr=gp.enrichr(gene_list=gene_list,organism=self.organism,gene_sets=gene_set_database,outdir=outdir)

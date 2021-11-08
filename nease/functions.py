@@ -382,8 +382,7 @@ def extract_subnetwork(path_genes,
     
         # Affected_genes: genes with lost/gained interaction in the pathway
         # all_spliced_genes: all genes affected with splicing
-        
-        
+        all_spliced_genes=[ Ensemb_to_entrez(x,mapping) for x in all_spliced_genes]
 
         # Extract the pathway module for the complete PPI
         # We would like to visualize the pathway with affected edges:

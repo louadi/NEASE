@@ -39,5 +39,6 @@ PPI['Human']=load_obj(os.path.join(here,'data/network/PPI_Human'))
 elm['Human']= pd.read_pickle(os.path.join(here,"data/database/elm"))
 elm_interactions['Human']= pd.read_pickle(os.path.join(here,"data/database/ELM_interactions"))
 pdb['Human']= pd.read_pickle(os.path.join(here,"data/database/pdb"))
+non_coding=load_obj(os.path.join(here,'data/database/non_coding'))
 
 

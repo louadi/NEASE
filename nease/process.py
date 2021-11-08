@@ -62,7 +62,9 @@ def process_standard (data,
                       mapping,
                       min_delta,
                       only_DDIs,
-                      nease_data):
+                      nease_data,
+                      remove_non_in_frame,
+                      only_divisible_by_3):
     
         # verify the input data format
         columns=data.columns
@@ -96,7 +98,47 @@ def process_standard (data,
         
         
         data['symetric']=data.apply(lambda x: abs(x[columns[1]]- x[columns[2]])%3==0, axis=1)
+        
+                
+        # get all coding genes affected by splicing
+        spliced_genes=list(data[columns[0]].unique())
+        
+        
 
+        data['symetric']=data.apply(lambda x: (abs(x[columns[1]]- x[columns[2]])+1)%3==0, axis=1)
+        
+        # only non-symetric genes                                            
+        non_symetric_genes=list(data[~data['symetric']][columns[0]].unique())
+        
+                
+        #################
+        # filtering steps
+        initial=len(data)
+        
+        if only_divisible_by_3:
+            data=data[data.symetric]
+            print("You selected to remove all exons that are not divisible by 3 [(abs(start-end)+1) / 3].\nIf you would like to change this option, and include all exons, please change the parameter only_divisible_by_3 to False.")
+                
+        if remove_non_in_frame:
+            # parse gene coord as one set 
+            data['coord']=data.apply(lambda x:{x[0],x[1],x[2]}  ,axis = 1)
+            # only keep coding exons
+            coding=[ (e not in nease_data.non_coding)  for e in data['coord']]
+            data=data[coding]
+            
+            
+            data=data.drop(columns=[ 'coord'])
+            
+            print("\nYou selected to remove all exons that are predicted to disturb the ORF or known to result in a non-coding gene.\nIf you would like to change this option and include all exons, please change the parameter remove_non_in_frame to False. ")
+            
+        
+        filtred=initial-len(data)            
+        if filtred!=0:
+                print('\n'+str(filtred)+' Exons out of '+str(initial)+' were removed.')
+        
+        
+    
+        
         # map to domains by calculating the overlap of exon coordinate and domain
         mapping_tb=pd.merge(data, mapping,   left_on=columns[0], right_on='Gene stable ID').drop_duplicates()   
         
@@ -106,14 +148,7 @@ def process_standard (data,
                 
                 elm_affected,pdb_affected=get_interfaces(data,nease_data,min_delta,overlap_cal=True)
         
-        
-        # get all coding genes affected by splicing
-        # Only genes with Pfam domain will be considred here
-        # NCBI id used here for the network visualization
-        spliced_genes=list(mapping_tb['NCBI gene ID'].unique())
-        
-        # only symetric genes                                            
-        symetric_genes=list(mapping_tb[~mapping_tb['symetric']]['NCBI gene ID'].unique())
+
 
         if len(mapping_tb)==0:
             return []
@@ -155,7 +190,7 @@ def process_standard (data,
         #mapping_tb=mapping_tb.groupby(['Gene name','NCBI gene ID','Gene stable ID','Exon stable ID','Pfam ID']).max()['max_change']
 
         
-        return mapping_tb,spliced_genes,elm_affected,pdb_affected,symetric_genes
+        return mapping_tb,spliced_genes,elm_affected,pdb_affected,non_symetric_genes
 
 
 
@@ -258,7 +293,7 @@ def process_MAJIQ(data,
         # Only genes with Pfam domain will be considred here
         # NCBI id used here for the network visualization
         spliced_genes=list(data['Gene ID'].unique())
-        spliced_genes=[Ensemb_to_entrez(x,mapping) for x in spliced_genes ]
+        #spliced_genes=[Ensemb_to_entrez(x,mapping) for x in spliced_genes ]
         
 
         junctions=list(data['Junctions coords'])
@@ -490,7 +525,7 @@ def Entrez_to_name(gene,mapping):
     
 def Ensemb_to_entrez(gene,mapping):
     try:
-        entrez=mapping[mapping['Gene stable ID']==gene]['NCBI gene ID'].unique()
+        entrez=int(mapping[mapping['Gene stable ID']==gene]['NCBI gene ID'].unique())
             
         if len(entrez)==0:
             # try to convert it online
@@ -499,7 +534,23 @@ def Ensemb_to_entrez(gene,mapping):
                   df_index = True)
             entrez=out['entrezgene']
             
-        return str(entrez[0])
+        return int((entrez[0]))
+    
+    except :
+        return gene
+    
+def Ensemb_to_name(gene,mapping):
+    try:
+        name=mapping[mapping['Gene stable ID']==gene]['Gene name'].unique()
+            
+        if len(name)==0:
+            # try to convert it online
+            mg = mygene.MyGeneInfo()
+            out = mg.querymany(gene, scopes="ensembl.gene", fields='symbol', species="human", verbose=False, as_dataframe = True,
+                  df_index = True)
+            name=out['symbol']
+            
+        return name[0]
     
     except :
         return gene
