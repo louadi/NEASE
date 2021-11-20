@@ -29,7 +29,7 @@ setup(name='nease',
       include_package_data=True,
       python_requires='>=3.6',
       install_requires=[
-        'pandas>=1.1.0',
+        'pandas>=1.3.0',
         'numpy>= 1.19',
         'networkx>=2.5',
         'plotly>=4.14.3',
