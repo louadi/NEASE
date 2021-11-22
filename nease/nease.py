@@ -485,7 +485,7 @@ class run(object):
             
         else:
             # get gene sets supported in gseapy
-            gseapy_library = gp.get_library_name(database=self.organism)
+            gseapy_library = gp.get_library_name(organism=self.organism)
             
             
             # compare with user input with gseapy_library
