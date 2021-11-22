@@ -525,8 +525,7 @@ def Entrez_to_name(gene,mapping):
     
 def Ensemb_to_entrez(gene,mapping):
     try:
-        entrez=int(mapping[mapping['Gene stable ID']==gene]['NCBI gene ID'].unique())
-            
+        entrez=mapping[mapping['Gene stable ID']==gene]['NCBI gene ID'].unique()
         if len(entrez)==0:
             # try to convert it online
             mg = mygene.MyGeneInfo()
@@ -534,6 +533,7 @@ def Ensemb_to_entrez(gene,mapping):
                   df_index = True)
             entrez=out['entrezgene']
             
+
         return int((entrez[0]))
     
     except :

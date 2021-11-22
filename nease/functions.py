@@ -379,10 +379,11 @@ def extract_subnetwork(path_genes,
                        affected_graph,
                        significant):
 
-    
+
         # Affected_genes: genes with lost/gained interaction in the pathway
         # all_spliced_genes: all genes affected with splicing
         all_spliced_genes=[ Ensemb_to_entrez(x,mapping) for x in all_spliced_genes]
+        
 
         # Extract the pathway module for the complete PPI
         # We would like to visualize the pathway with affected edges:
@@ -411,7 +412,7 @@ def extract_subnetwork(path_genes,
                                 mode='markers+text',
                                 hoverinfo='text',
                                 textposition='top center',
-                                #textfont_size = 20,
+                                #textfont_size = 22,
                                 marker=dict(
                                 reversescale=True,
                                     color=[],
@@ -432,7 +433,7 @@ def extract_subnetwork(path_genes,
                                 line=dict(width=4,
                                           color='red'),
                                 hoverinfo='none')
-
+        
         for node in G.nodes():
             x, y = G.nodes[node]['pos']
             node_trace['x'] += tuple([x])

@@ -657,6 +657,7 @@ class run(object):
                  path_id,
                  file='', 
                  k=0.8,
+                 save_pdf=False,
                  auto_open=True):
 
             '''
@@ -769,6 +770,11 @@ class run(object):
 
                     file_path=os.path.join(os.path.dirname(file),path_name+'.html')
                     fig.write_html(file_path, auto_open=auto_open)
+                    
+                    if save_pdf:
+                        fig.write_image(os.path.join(os.path.dirname(file),path_name+'.pdf'),format='pdf',width=2544,height=1313)
+                    
+
                     print('Visualization of the pathway generated in: '+file_path)
                     
                     return
