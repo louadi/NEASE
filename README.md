@@ -162,12 +162,14 @@ path_id: a string representing the Pathway ID.
 
 file: a string representing a local file path for the HTML file.
 
+save_pdf: If True. also save the figure as PDF.
+
 k: a Float for the algorithm  Fruchterman-Reingold force-directed for nodes positions, to be tuned by the user. You might need to run the following function multiple times for an optimal visualizations.
         [more details](https://networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.spring_layout.html).
        
 
 ```python
-events.Vis_path("R-HSA-5674135",file='AS data/enrichment/',k=0.8)
+events.Vis_path("R-HSA-5674135",file='AS data/enrichment/',save_pdf=False,k=0.8)
 ```
 
 
