@@ -146,7 +146,7 @@ class run(object):
                     
                             data=data[data['FDR']<=p_value_cutoff]
                             data=data[['GeneID','exonStart_0base','exonEnd','IncLevelDifference']]
-                            
+                            data['GeneID']=data['GeneID'].apply(lambda x: x.split('.')[0])
 
                             self.data,self.spliced_genes,self.elm_affected,self.pdb_affected,self.symetric_genes=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self,remove_non_in_frame,only_divisible_by_3)
 
