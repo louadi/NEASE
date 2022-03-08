@@ -49,9 +49,9 @@ The standard input of the package (also the recommended) is a DataFrame object w
 
 In the case of differential splicing analysis, please make sure to filter events by significance beforehand, for example using a p-value cutoff. 
 
-The package also supports the output of multiple AS differential detection tools such as rMATs, Whippet and MAJIQ.
+The package also supports the output of multiple AS differential detection tools such as rMATs, Whippet and MAJIQ. For the newer version of MAJIQ, pleasee check [the issue](https://github.com/louadi/NEASE/issues/3). 
 
-If you need help with your data or need to add support for another tools, please contact us.
+If you need help with your data or need to add support for another tools, open an issue or contact us.
 
 
 
