@@ -206,7 +206,3 @@ Louadi, Z., Elkjaer, M.L., Klug, M. et al. Functional enrichment of alternative 
 
 
 
-
-
-## Contact 
-Zakaria Louadi: louadi@wzw.tum.de
