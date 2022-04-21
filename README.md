@@ -1,3 +1,7 @@
+[![PyPI version](https://badge.fury.io/py/nease.svg)](https://badge.fury.io/py/nease)
+
+
+
 # NEASE
 NEASE  (Network Enrichment method for Alternative Splicing Events) a tool for functional enrichment of alternative splicing exons/events. 
 

@@ -323,7 +323,7 @@ def process_MAJIQ(data,
                 if len(targets)==len(junc_confid[j]):
 
                     #filter low confident diff used event
-                    targets=[ x  for x,y in zip(targets, junc_confid[j]) if y>= 0.95]
+                    targets=[ x  for x,y in zip(targets, junc_confid[j]) if y>= Majiq_confidence]
 
                     #save
                     jun_to_target[j]=targets
