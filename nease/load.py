@@ -41,4 +41,11 @@ elm_interactions['Human']= pd.read_pickle(os.path.join(here,"data/database/ELM_i
 pdb['Human']= pd.read_pickle(os.path.join(here,"data/database/pdb"))
 non_coding=load_obj(os.path.join(here,'data/database/non_coding'))
 
+database_mapping['Mouse']= pd.read_pickle(os.path.join(here,"data/database/Mouse"))
+Pathways['Mouse']= pd.read_pickle(os.path.join(here,"data/pathways/pathways_mouse"))
+network['Mouse']=load_obj(os.path.join(here,'data/network/graph_mouse'))
+PPI['Mouse']=load_obj(os.path.join(here,'data/network/PPI_mouse'))
+elm['Mouse']= pd.read_pickle(os.path.join(here,"data/database/elm_mouse"))
+elm_interactions['Mouse']= pd.read_pickle(os.path.join(here,"data/database/ELM_interactions_mouse"))
+pdb['Mouse']= pd.read_pickle(os.path.join(here,"data/database/pdb_mouse"))
 

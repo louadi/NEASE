@@ -11,7 +11,7 @@ import numpy as np
 
 # main functions for nease
       
-def exons_to_edges(mapped,G,elm_interactions):
+def exons_to_edges(mapped,G,elm_interactions,organism):
     
         # check if domains have known interactions/binding:
         mapped['domain']=mapped['NCBI gene ID']+'/'+mapped['Pfam ID']
@@ -40,10 +40,12 @@ def exons_to_edges(mapped,G,elm_interactions):
         #mapped['Interacting domain']=mapped['domain'].apply(lambda x: G.has_node(x))
         
         mapped=mapped.rename(columns={"max_change": "dPSI",
-                                      "domain": "Domain ID"}).reset_index(drop=True) 
-    
-        mapped['Visualization link']=''
-        mapped.loc[mapped['Interacting domain'],['Visualization link']]=DIGGER+mapped['Exon stable ID']
+                                      "domain": "Domain ID"}).reset_index(drop=True)
+        mapped['Visualization link'] = ''
+        if organism == 'Human':
+            mapped.loc[mapped['Interacting domain'], ['Visualization link']] = DIGGER + 'human/' + mapped['Exon stable ID']
+        elif organism == 'Mouse':
+            mapped.loc[mapped['Interacting domain'], ['Visualization link']] = DIGGER + 'mouse/' + mapped['Exon stable ID']
         return mapped
     
     
@@ -165,7 +167,6 @@ def pathway_enrichment(g2edges,paths, mapping,organism,p_value_cutoff,only_DDIs)
     pathway_genes=[]
     # Totat degree of structural network for human (pre-computer)
     # For statistical test: edge enrichment
-    # TO DO for mouse
     if organism=='Human':
         if only_DDIs:
             n=52467
@@ -177,6 +178,19 @@ def pathway_enrichment(g2edges,paths, mapping,organism,p_value_cutoff,only_DDIs)
 
         else:
             n=60235
+            ppi_type='Degree in the structural PPI'
+
+    elif organism=='Mouse':
+        if only_DDIs:
+            n=13348
+
+            #  every pathway degreee two sturctural PPIs and
+            # 'Degree in the structural PPI' : degree in ppi annotated with DDI.DMI/PDB
+            # 'Degree in the PPI/DDI' : degree in ppi annotated with DDI only
+            ppi_type='Degree in the PPI/DDI'
+
+        else:
+            n=31127
             ppi_type='Degree in the structural PPI'
     
     # number of effected edges 
@@ -223,10 +237,10 @@ def pathway_enrichment(g2edges,paths, mapping,organism,p_value_cutoff,only_DDIs)
                     # add gene to the gene list of the pathway
                     genes_tmp.append(Entrez_to_name(gene,mapping) +" ("+str(tmp)+")")
                     
-                    
+
                     # gene specific test
                     _,p_gene=edge_enrich(tmp ,len(g2edges[gene])-tmp , p, n)
-                        
+
                     if p_gene<=0.05:
                         # gene with edges siginifically connected to the pathway
                     
@@ -277,7 +291,6 @@ def single_path_enrich(path_id,Pathways,g2edges,mapping,organism,only_DDIs):
         
         # Totat degree of structural network for human (pre-computer)
         # For statistical test: edge enrichment
-        # TO DO for mouse
         if organism=='Human':
             if only_DDIs:
                 n=52467
@@ -286,8 +299,19 @@ def single_path_enrich(path_id,Pathways,g2edges,mapping,organism,only_DDIs):
             else:
                 n=60235
                 ppi_type='Degree in the structural PPI'
+        elif organism == 'Mouse':
+            if only_DDIs:
+                n = 13348
 
-            
+                 #  every pathway degreee two sturctural PPIs and
+                # 'Degree in the structural PPI' : degree in ppi annotated with DDI.DMI/PDB
+                # 'Degree in the PPI/DDI' : degree in ppi annotated with DDI only
+                ppi_type = 'Degree in the PPI/DDI'
+
+            else:
+                n = 31127
+                ppi_type = 'Degree in the structural PPI'
+
         p=int(Pathways [Pathways['external_id']==path_id][ppi_type])
         path_genes=list(Pathways [Pathways['external_id']==path_id]['entrez_gene_ids'])[0]
         
@@ -355,7 +379,8 @@ def edge_enrich(a,b,p,n):
     
     #linked to pathway but not affected
     c=p-a
-    
+    if c < 0:
+        return np.nan, 1.0
     # background of test: not linked to p and not affected edges
     d=(2*n)-p-b
     

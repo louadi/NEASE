@@ -84,13 +84,13 @@ def process_standard (data,
                 try:
                         
                         # Remove non numerical 
-                        if  not data[columns[1]].dtype=='int':
+                        if  not data[columns[1]].dtype=='int64':
                             data=data[data[columns[1]].apply(lambda x: x.isnumeric())]
                             # convert to int
                             data[columns[1]]=data[columns[1]].astype(int)
                             
                             
-                        if not data[columns[2]].dtype=='int':
+                        if not data[columns[2]].dtype=='int64':
                             data=data[data[columns[2]].apply(lambda x: x.isnumeric())]
                             data[columns[2]]=data[columns[2]].astype(int)
                 except:
@@ -137,8 +137,7 @@ def process_standard (data,
                 print('\n'+str(filtred)+' Exons out of '+str(initial)+' were removed.')
         
         
-    
-        
+
         # map to domains by calculating the overlap of exon coordinate and domain
         mapping_tb=pd.merge(data, mapping,   left_on=columns[0], right_on='Gene stable ID').drop_duplicates()   
         
@@ -294,12 +293,21 @@ def process_MAJIQ(data,
         # NCBI id used here for the network visualization
         spliced_genes=list(data['Gene ID'].unique())
         #spliced_genes=[Ensemb_to_entrez(x,mapping) for x in spliced_genes ]
-        
+
+        # Define a custom function to handle NaN values during join
+        def custom_join(row):
+            if pd.notna(row["Junctions coords"]) and pd.notna(row["IR coords"]):
+                return f"{row['Junctions coords']};{row['IR coords']}"
+            else:
+                return row['Junctions coords']
+
 
         junctions=list(data['Junctions coords'])
-        confidence=list(data['P(|dPSI|>=0.20)'])   
+        ir=list(data['IR coords'])
+        data['test'] = data.apply(custom_join, axis=1)
+        junctions = list(data['test'])
+        confidence=list(data['P(|dPSI|>=0.20)'])
         junc_confid=dict(zip(junctions, confidence))
-        
 
         complexx=0
         jun_to_target={}
@@ -318,7 +326,8 @@ def process_MAJIQ(data,
             else: 
                 targets=[ y for y in x if y not in source ]
 
-
+                test = len(targets)
+                test2 = len(junc_confid[j])
                 #check if we have correct confidence for every target
                 if len(targets)==len(junc_confid[j]):
 
@@ -328,14 +337,12 @@ def process_MAJIQ(data,
                     #save
                     jun_to_target[j]=targets
                     jun_to_source[j]=int(source[0])
-        
-        
         t=lambda x:  jun_to_target[x] if x in jun_to_target.keys() else False
-        data["targets"] = data['Junctions coords'].apply(t)
+        data["targets"] = data['test'].apply(t)
         
         
         g=lambda x:  jun_to_source[x] if x in jun_to_source.keys() else False
-        data["source"] = data['Junctions coords'].apply(g)
+        data["source"] = data['test'].apply(g)
         
         
         data=data[data['targets']!=False]
@@ -353,11 +360,8 @@ def process_MAJIQ(data,
                 data=data  [ [ 'Gene ID','E(dPSI) per LSV junction' , 'Junctions coords','P(|dPSI|>=0.20) per LSV junction','delta','targets','source' ]]
 
                 data['targets']=data['targets'].astype(int)
-                
-                
-                
-                
-                    
+
+
                 #Map exons to domain
                 mapping_tb=pd.merge(mapping, data,  left_on='Genomic coding start', right_on='targets')
 
