@@ -120,10 +120,10 @@ def affected_edges(nease_data,Join,only_DDIs):
 
 
 
-                    interacting_domains=interacting_domains[['Gene name','NCBI gene ID','Identifier','dPSI','Affected binding (NCBI)']].append(elm_affected, ignore_index=True)
+                    interacting_domains=pd.concat([interacting_domains, elm_affected], ignore_index=True)
 
 
-            
+
             return interacting_domains
     
     
