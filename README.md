@@ -76,6 +76,8 @@ import pandas as pd
 
 table: Data input as DataFrame object as explained in "Data input".
 
+organism: Either 'Human' or 'Mouse'.
+
 input_type: Either 'Standard', 'Whippet', 'rmats'or "MAJIQ".
 
 remove_non_in_frame: Remove exons that are predicted to disturb the ORF ([Prediction source](https://vastdb.crg.eu/wiki/FAQ#:~:text=positions%20were%20analyzed.-,How%20is%20the%20impact%20on%20the%20ORF%20predicted%3F,-The%20pipeline%20to)). 
