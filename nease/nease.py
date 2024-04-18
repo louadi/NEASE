@@ -88,11 +88,9 @@ class run(object):
             self.input_type=input_type
 
             if not only_DDIs:
-                
                 self.elm=elm[organism]
                 self.elm_interactions=elm_interactions[organism]
                 self.pdb=pdb[organism]
-            
             self.non_coding=non_coding
             self.data=[]
             self.spliced_genes=[]
@@ -126,7 +124,7 @@ class run(object):
             elif input_type=='Whippet':
                 
                 try:
-                
+                    data = data[data['DeltaPsi'] >= 0.90]
                     data=data.rename_axis('Gene ID').reset_index()
                     data['tmp']= data['Node'].apply(lambda x: x.split(':')[1])
 
@@ -157,9 +155,8 @@ class run(object):
             elif input_type=='DEXSeq':  
                 
                 try:
-                            
                             data=data[data['padj']<=p_value_cutoff]
-                            data=data[[data.columns[0],'genomicData.start','genomicData.end','log2fold_control_case']]
+                            data=data[[data.columns[1],'genomicData.start','genomicData.end','log2fold_control_case']]
                             print('proceding with log2fold threshold: '+str(min_delta))
                             self.data,self.spliced_genes,self.elm_affected,self.pdb_affected,self.symetric_genes=process_standard(data,self.mapping,min_delta ,self.only_DDIs,self,remove_non_in_frame,only_divisible_by_3)
 
@@ -184,7 +181,7 @@ class run(object):
 
             
 
-            if len(self.data)==0:
+            if len(self.data)==0:#
                 print('process canceled...')
                 
                 
@@ -201,7 +198,7 @@ class run(object):
                 self.elm_interactions['interactor 1']=self.elm_interactions['Interator gene 1'].astype('str')+"/"+self.elm_interactions['Elm id of gene 1']
                 self.elm_interactions['interactor 2']=self.elm_interactions['Interator gene 2'].astype('str')+"/"+self.elm_interactions['Domain of gene 2']
                 
-                self.data=exons_to_edges(self.data,Join,self.elm_interactions)
+                self.data=exons_to_edges(self.data,Join,self.elm_interactions,self.organism)
                 
                 
                 
@@ -211,7 +208,7 @@ class run(object):
                 print(str(len(self.data['Domain ID'].unique()))+' protein domains are affected by AS.\n')
                 if not self.only_DDIs:
                     print(str(len(self.elm_affected['ELMIdentifier'].unique()))+" linear motifs are affected by AS.\n"
-                          +str(len(self.pdb_affected))+ ' interacting resiude are affected by AS.\n')
+                          +str(len(self.pdb_affected))+ ' interacting residue are affected by AS.\n')
                       
                 print(str(len(self.data[self.data['Interacting domain']]['Domain ID'].unique()))+' of the affected domains/motifs have known interactions.') 
                 
@@ -342,14 +339,14 @@ class run(object):
         if len(self.data)==0 :
             print('Processing failed')
 
+
+        # elif self.organism=="Mouse":
+        #         #no visualization available for mouse in DIGGER
+        #         return self.data.drop(columns=['Domain ID','Visualization link'])
+        # else:
             
-        elif self.organism=="Mouse":
-                #no visualization available for mouse in DIGGER
-                return self.data.drop(columns=['Domain ID','Visualization link'])
-        else:
-            
-            #DIGGER visualization available for Human
-            return self.data.drop(columns=[ 'Domain ID','DDI','elm']).reset_index(drop=True)
+        #DIGGER visualization available for Human and Mouse
+        return self.data.drop(columns=[ 'Domain ID','DDI','elm']).reset_index(drop=True)
     
     
     
